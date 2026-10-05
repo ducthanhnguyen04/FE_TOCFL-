@@ -15,7 +15,7 @@
 @media (min-width: 900px) {
   .header {
     padding: 0 24px 0 16px;
-    border-bottom: 1.5px solid #232323;
+    border-bottom: 1.5px solid var(--border-sketch);
   }
 }
 
@@ -34,7 +34,7 @@
   height: 40px;
   border: 2px solid #222;
   border-radius: var(--sketch-radius);
-  background-color: #faf7ee;
+  background-color: var(--bg-paper);
   box-shadow: 2px 2px 0px #222;
   transition: all 0.15s ease;
 }
@@ -75,7 +75,7 @@
 
 .chineseBadge {
   background-color: #df2a22;
-  color: #ffffff;
+  color: var(--bg-paper)fff;
   font-weight: 800;
   font-size: 13.5px;
   padding: 2px 7px;
@@ -94,7 +94,7 @@
   font-family: var(--font-doodle), cursive, sans-serif;
   font-size: 27px;
   font-weight: 800;
-  color: #222222;
+  color: var(--border-sketch);
   letter-spacing: 0.5px;
   position: relative;
   display: inline-block;
@@ -145,7 +145,7 @@
   align-items: center;
   gap: 6px;
   background-color: #272727;
-  color: #ffffff;
+  color: var(--bg-paper)fff;
   padding: 7px 15px;
   border-radius: var(--sketch-radius);
   font-size: 13.5px;
@@ -174,17 +174,17 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  background-color: #faf7ee;
-  border: 2px solid #232323;
+  background-color: var(--bg-paper);
+  border: 2px solid var(--border-sketch);
   padding: 4px 12px 4px 4px;
   border-radius: 40px;
-  box-shadow: 2px 2px 0px #232323;
+  box-shadow: 2px 2px 0px var(--border-sketch);
 }
 .userAvatar {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  border: 1.5px solid #232323;
+  border: 1.5px solid var(--border-sketch);
   object-fit: cover;
 }
 .userDetails {
@@ -194,11 +194,11 @@
 .userName {
   font-size: 13px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: var(--text-primary);
 }
 .userEmail {
   font-size: 11px;
-  color: #666;
+  color: var(--text-secondary);
 }
 .logoutBtn {
   display: flex;
@@ -228,7 +228,7 @@
   align-items: center;
   justify-content: center;
   background-color: transparent;
-  color: #111;
+  color: var(--text-primary);
   transition: all 0.1s ease;
   position: relative;
 }
@@ -276,20 +276,20 @@
   top: 50px;
   right: -10px;
   width: 260px;
-  background-color: #faf7ee;
+  background-color: var(--bg-paper);
   display: flex;
   flex-direction: column;
   z-index: 100;
   border-radius: var(--sketch-radius);
-  border: 1.5px solid #232323;
-  box-shadow: 2px 2px 0px #232323;
+  border: 1.5px solid var(--border-sketch);
+  box-shadow: 2px 2px 0px var(--border-sketch);
   padding: 0;
   overflow: hidden;
 }
 
 .dropdownHeader {
   padding: 16px 20px;
-  border-bottom: 1.5px solid #232323;
+  border-bottom: 1.5px solid var(--border-sketch);
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -298,12 +298,12 @@
 .dropdownName {
   font-weight: 800;
   font-size: 15px;
-  color: #1a1a1a;
+  color: var(--text-primary);
 }
 
 .dropdownEmail {
   font-size: 12px;
-  color: #666;
+  color: var(--text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -325,7 +325,7 @@
   font-weight: 600;
   text-align: left;
   transition: background-color 0.15s ease;
-  color: #1a1a1a;
+  color: var(--text-primary);
 }
 
 .dropdownItem:hover {
@@ -357,21 +357,21 @@
   top: 50px;
   right: -20px;
   width: 320px;
-  background-color: #faf7ee;
+  background-color: var(--bg-paper);
   display: flex;
   flex-direction: column;
   z-index: 100;
   border-radius: var(--sketch-radius);
-  border: 1.5px solid #232323;
-  box-shadow: 2px 2px 0px #232323;
+  border: 1.5px solid var(--border-sketch);
+  box-shadow: 2px 2px 0px var(--border-sketch);
 }
 
 .notifHeader {
   padding: 16px 20px;
   font-weight: 800;
   font-size: 16px;
-  color: #1a1a1a;
-  border-bottom: 2px solid #232323;
+  color: var(--text-primary);
+  border-bottom: 2px solid var(--border-sketch);
 }
 
 .notifBody {

@@ -34,7 +34,7 @@
   font-family: var(--font-body), sans-serif;
   font-size: 26px;
   font-weight: 800;
-  color: #1a1a1a;
+  color: var(--text-primary);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -51,11 +51,11 @@
 .highlightWord {
   display: inline-block;
   background-color: #f1cf5b;
-  color: #1a1a1a;
+  color: var(--text-primary);
   padding: 1px 12px;
   border-radius: var(--sketch-radius);
-  border: 2px solid #232323;
-  box-shadow: 2px 2px 0px #232323;
+  border: 2px solid var(--border-sketch);
+  box-shadow: 2px 2px 0px var(--border-sketch);
   line-height: 1.25;
   font-weight: 800;
 }
@@ -85,7 +85,7 @@
 }
 
 .learnMoreLink {
-  color: #1a1a1a;
+  color: var(--text-primary);
   font-weight: 700;
   text-decoration: underline;
   text-decoration-thickness: 1.5px;
@@ -117,24 +117,24 @@
   gap: 6px;
   padding: 6px 14px;
   background-color: #faf7ee;
-  border: 2px solid #232323;
+  border: 2px solid var(--border-sketch);
   border-radius: var(--sketch-radius);
-  box-shadow: 2px 2px 0px #232323;
+  box-shadow: 2px 2px 0px var(--border-sketch);
   font-size: 13px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: var(--text-primary);
   transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .communityBtn:hover {
   transform: translateY(-2px);
-  box-shadow: 3px 3px 0px #232323;
+  box-shadow: 3px 3px 0px var(--border-sketch);
   background-color: #fff9e6;
 }
 
 .communityBtn:active {
   transform: translateY(1px);
-  box-shadow: 1px 1px 0px #232323;
+  box-shadow: 1px 1px 0px var(--border-sketch);
 }
 
 .pinIcon {

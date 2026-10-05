@@ -16,9 +16,9 @@
   width: 10px;
   height: 38px;
   background-color: #e5b35e;
-  border: 2px solid #232323;
+  border: 2px solid var(--border-sketch);
   border-radius: var(--sketch-radius);
-  box-shadow: 1.5px 1.5px 0px #232323;
+  box-shadow: 1.5px 1.5px 0px var(--border-sketch);
   position: relative;
   overflow: hidden;
 }
@@ -30,8 +30,8 @@
   left: 0;
   right: 0;
   height: 7px;
-  background-color: #faf7ee;
-  border-bottom: 1.5px solid #232323;
+  background-color: var(--bg-paper);
+  border-bottom: 1.5px solid var(--border-sketch);
 }
 
 .titleArea {
@@ -43,7 +43,7 @@
   font-family: var(--font-body), sans-serif;
   font-size: 22px;
   font-weight: 800;
-  color: #1a1a1a;
+  color: var(--text-primary);
   line-height: 1.2;
 }
 
