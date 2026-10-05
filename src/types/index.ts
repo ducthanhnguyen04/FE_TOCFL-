@@ -1,4 +1,4 @@
-export interface HSKLevelItem {
+export interface TOCFLLevelItem {
   id: number;
   title: string;
   level: number;

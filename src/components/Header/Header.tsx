@@ -34,10 +34,10 @@ export const Header: React.FC<HeaderProps> = ({
         </button>
 
         <Link href="/" className={styles.logoWrapper}>
-          <div className={styles.chineseBadge}>汉语</div>
+          <div className={styles.chineseBadge}>華語</div>
           <div className={styles.logoTextContainer}>
             <span className={styles.logoBrand}>NHAI!</span>
-            <span className={styles.logoSub}>H.S.K</span>
+            <span className={styles.logoSub}>TOCFL</span>
           </div>
         </Link>
       </div>

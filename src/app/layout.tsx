@@ -17,8 +17,8 @@ const patrickHand = Patrick_Hand({
 });
 
 export const metadata: Metadata = {
-  title: 'Nhai HSK - Học tiếng Trung & Luyện thi HSK 3.0',
-  description: 'Website tự học tiếng Trung và luyện thi HSK 3.0 miễn phí từ cấp 1 đến cấp 9 với giáo trình từ vựng, ngữ pháp, pinyin và shadowing.',
+  title: 'Nhai TOCFL - Học tiếng Đài Loan & Luyện thi TOCFL 3.0',
+  description: 'Website tự học tiếng Đài Loan và luyện thi TOCFL 3.0 miễn phí từ cấp 1 đến cấp 9 với giáo trình từ vựng, ngữ pháp, pinyin và shadowing.',
 };
 
 export default function RootLayout({

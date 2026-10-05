@@ -1,0 +1,47 @@
+'use client';
+
+import React from 'react';
+import styles from './TOCFLSection.module.css';
+import { TOCFLCard } from '../TOCFLCard/TOCFLCard';
+import { TOCFL_LEVELS } from '@/data/tocflData';
+import { TOCFLLevelItem } from '@/types';
+
+interface TOCFLSectionProps {
+  onCardClick?: (item: TOCFLLevelItem) => void;
+}
+
+export const TOCFLSection: React.FC<TOCFLSectionProps> = ({ onCardClick }) => {
+  // Main cards are TOCFL 1 to 6
+  const primaryLevels = TOCFL_LEVELS.slice(0, 6);
+  // Peek card is TOCFL 7-9 (as shown partially at bottom of screenshot)
+  const advancedLevels = TOCFL_LEVELS.slice(6);
+
+  return (
+    <section className={styles.section} id="tocfl-section">
+      {/* Section Header */}
+      <div className={styles.sectionHeader}>
+        <div className={styles.pencilIndicator} aria-hidden="true" />
+        <div className={styles.titleArea}>
+          <h2 className={styles.sectionTitle}>TOCFL 3.0</h2>
+          <span className={styles.sectionSubtitle}>Bản cải tiến</span>
+        </div>
+      </div>
+
+      {/* Main 6 Cards Grid */}
+      <div className={styles.cardsGrid}>
+        {primaryLevels.map((item) => (
+          <TOCFLCard key={item.id} item={item} onClick={onCardClick} />
+        ))}
+      </div>
+
+      {/* Advanced TOCFL 7-9 Peek Row */}
+      {advancedLevels.length > 0 && (
+        <div className={styles.peekRow}>
+          {advancedLevels.map((item) => (
+            <TOCFLCard key={item.id} item={item} onClick={onCardClick} />
+          ))}
+        </div>
+      )}
+    </section>
+  );
+};

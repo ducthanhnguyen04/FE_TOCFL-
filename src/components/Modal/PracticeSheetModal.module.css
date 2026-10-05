@@ -1,0 +1,186 @@
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+
+.modalContent {
+  background: #faf7ee;
+  width: 90vw;
+  max-width: 900px;
+  max-height: 90vh;
+  border-radius: 12px;
+  border: 2px solid #232323;
+  box-shadow: 4px 4px 0px #232323;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modalHeader {
+  padding: 16px 20px;
+  border-bottom: 2px solid #232323;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+}
+
+.modalTitle {
+  font-size: 18px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.headerActions {
+  display: flex;
+  gap: 12px;
+}
+
+.printBtn, .closeBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-weight: 700;
+  border: 2px solid #232323;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 2px 2px 0px #232323;
+}
+
+.printBtn {
+  background: #2b7fd4;
+  color: white;
+}
+
+.printBtn:hover {
+  background: #358be0;
+  transform: translateY(-1px);
+  box-shadow: 3px 3px 0px #232323;
+}
+
+.closeBtn:hover {
+  background: #ffeae8;
+  transform: translateY(-1px);
+  box-shadow: 3px 3px 0px #232323;
+}
+
+.modalBody {
+  padding: 24px;
+  overflow-y: auto;
+  background: #e6e6e6; /* subtle dark background for preview */
+  display: flex;
+  justify-content: center;
+}
+
+.a4Paper {
+  background: white;
+  width: 210mm;
+  min-height: 297mm;
+  padding: 20mm;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.wordBlock {
+  margin-bottom: 32px;
+  page-break-inside: avoid;
+}
+
+.wordHeader {
+  margin-bottom: 8px;
+}
+
+.wordTitleRow {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.charBold {
+  font-size: 28px;
+  font-weight: 800;
+  font-family: "KaiTi", "STKaiti", "BiauKai", serif;
+  color: #111;
+}
+
+.pinyin {
+  font-size: 16px;
+  color: #555;
+  font-family: sans-serif;
+}
+
+.meaning {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #333;
+}
+
+.gridRow {
+  display: flex;
+  border-top: 1px solid #111;
+  border-left: 1px solid #111;
+}
+
+.gridBox {
+  width: calc(100% / 11);
+  aspect-ratio: 1 / 1;
+  border-right: 1px solid #111;
+  border-bottom: 1px solid #111;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Dashed lines inside the box */
+.gridBox::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  border-top: 1px dashed #ccc;
+  z-index: 1;
+}
+
+.gridBox::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  border-left: 1px dashed #ccc;
+  z-index: 1;
+}
+
+.traceChar {
+  font-size: 38px;
+  font-family: "KaiTi", "STKaiti", "BiauKai", serif;
+  color: #e0e0e0;
+  z-index: 2;
+  position: relative;
+  user-select: none;
+}
+
+
+
+@media print {
+  .modalHeader {
+    display: none !important;
+  }
+  .modalOverlay {
+    background: white;
+  }
+}

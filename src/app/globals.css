@@ -6,7 +6,7 @@
   --text-secondary: #5a5a5a;
   --text-muted: #7e7e7e;
   
-  /* Primary HSK Colors */
+  /* Primary TOCFL Colors */
   --card-red-top: #c23838;
   --card-red-texture: #b02c2c;
   --card-cream-text: #faebbe;
@@ -143,4 +143,22 @@ a {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #a9a08e;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .printableArea, .printableArea * {
+    visibility: visible;
+  }
+  .printableArea {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+  }
 }

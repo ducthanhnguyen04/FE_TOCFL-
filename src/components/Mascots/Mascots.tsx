@@ -83,7 +83,7 @@ export const RobotMascot: React.FC<{ onClick?: () => void }> = ({ onClick }) => 
       onClick={onClick}
       role="button"
       tabIndex={0}
-      title="Trợ lý AI Nhai HSK - Hỏi đáp 24/7"
+      title="Trợ lý AI Nhai TOCFL - Hỏi đáp 24/7"
     >
       <svg width="60" height="54" viewBox="0 0 70 60" fill="none">
         {/* Flag Ball in Background */}

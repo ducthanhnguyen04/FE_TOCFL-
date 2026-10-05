@@ -1,0 +1,103 @@
+.hanziWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: fadeIn 0.3s ease;
+}
+
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+@media (max-width: 600px) {
+  .headerRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+}
+
+.sectionTitle {
+  font-size: 12px;
+  font-weight: 800;
+  color: #666;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.actionsGroup {
+  display: flex;
+  gap: 12px;
+}
+
+.actionBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a1a1a;
+  background-color: #faf7ee;
+  border: 1.5px solid #232323;
+  box-shadow: 2px 2px 0px #232323;
+  transition: all 0.15s ease;
+}
+
+.actionBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 2.5px 2.5px 0px #232323;
+}
+
+.actionBtn:active {
+  transform: translateY(1px);
+  box-shadow: 1px 1px 0px #232323;
+}
+
+.flashcardBtn {
+  background-color: #f1cf5b;
+}
+
+.flashcardBtn:hover {
+  background-color: #f4d976;
+}
+
+.gridContainer {
+  background-color: #efeadd;
+  padding: 16px;
+  border: 2px solid #232323;
+  box-shadow: 3px 3px 0px #232323;
+}
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.charBox {
+  width: 42px;
+  height: 42px;
+  background-color: #faf7ee;
+  border: 1.5px solid #232323;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-family: "KaiTi", "STKaiti", "BiauKai", serif;
+  color: #1a1a1a;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  position: relative;
+}
+
+.charBox:hover {
+  background-color: #fff;
+  transform: scale(1.1);
+  z-index: 2;
+  box-shadow: 2px 2px 0px #232323;
+}

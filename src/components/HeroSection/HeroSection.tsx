@@ -61,19 +61,19 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
       {/* Intro Description */}
       <div className={styles.introText}>
         <p>
-          Tiếp tục hành trình từ vựng tiếng Trung của bạn — mỗi ngày một chút là đủ.
+          Tiếp tục hành trình từ vựng tiếng Đài Loan của bạn — mỗi ngày một chút là đủ.
         </p>
         <p>
-          Nhai HSK là website miễn phí giúp bạn tự học tiếng Trung và luyện thi HSK 3.0 (cấp 1–9): giáo trình từ vựng – ngữ pháp, bảng pinyin, bộ thủ, từ điển, shadowing video và ôn tập ngắt quãng.{' '}
+          Nhai TOCFL là website miễn phí giúp bạn tự học tiếng Đài Loan và luyện thi TOCFL 3.0 (cấp 1–9): giáo trình từ vựng – ngữ pháp, bảng pinyin, bộ thủ, từ điển, shadowing video và ôn tập ngắt quãng.{' '}
           <a
-            href="#hsk-intro"
+            href="#tocfl-intro"
             className={styles.learnMoreLink}
             onClick={(e) => {
               e.preventDefault();
               onLearnMore?.();
             }}
           >
-            Tìm hiểu thêm về Nhai HSK
+            Tìm hiểu thêm về Nhai TOCFL
           </a>
         </p>
       </div>
@@ -89,7 +89,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           onClick={onJoinCommunity}
         >
           <span className={styles.pinIcon}>🎈</span>
-          <span>Nhai tiếng Trung mỗi ngày</span>
+          <span>Nhai tiếng Đài Loan mỗi ngày</span>
         </button>
       </div>
     </section>

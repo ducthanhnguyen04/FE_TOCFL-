@@ -58,8 +58,8 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
         {/* Drawer Header */}
         <div className={styles.drawerHeader}>
           <div className={styles.logoArea}>
-            <span className={styles.chineseBadge}>汉语</span>
-            <span className={styles.brandTitle}>NHAI! HSK</span>
+            <span className={styles.chineseBadge}>華語</span>
+            <span className={styles.brandTitle}>NHAI! TOCFL</span>
           </div>
           <button
             type="button"
@@ -120,7 +120,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
 
         {/* Footer */}
         <div className={styles.drawerFooter}>
-          <p>© 2026 Nhai HSK • Học vui mỗi ngày</p>
+          <p>© 2026 Nhai TOCFL • Học vui mỗi ngày</p>
         </div>
       </div>
     </div>

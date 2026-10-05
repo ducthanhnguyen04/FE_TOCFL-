@@ -3,10 +3,10 @@
 import React from 'react';
 import { X, BookOpen, Volume2 } from 'lucide-react';
 import styles from './CardDetailModal.module.css';
-import { HSKLevelItem } from '@/types';
+import { TOCFLLevelItem } from '@/types';
 
 interface CardDetailModalProps {
-  item: HSKLevelItem | null;
+  item: TOCFLLevelItem | null;
   onClose: () => void;
 }
 
@@ -78,7 +78,7 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({ item, onClose 
             {item.patternCount && (
               <div className={styles.statItem}>✍️ {item.patternCount} Mẫu câu</div>
             )}
-            <div className={styles.statItem}>🎯 HSK 3.0</div>
+            <div className={styles.statItem}>🎯 TOCFL 3.0</div>
           </div>
 
           <div className={styles.descriptionBox}>
