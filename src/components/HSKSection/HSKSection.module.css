@@ -1,0 +1,98 @@
+.section {
+  position: relative;
+  z-index: 1;
+  margin-top: 12px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+/* Yellow Pencil / Capsule indicator */
+.pencilIndicator {
+  width: 10px;
+  height: 38px;
+  background-color: #e5b35e;
+  border: 2px solid #232323;
+  border-radius: var(--sketch-radius);
+  box-shadow: 1.5px 1.5px 0px #232323;
+  position: relative;
+  overflow: hidden;
+}
+
+.pencilIndicator::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 7px;
+  background-color: #faf7ee;
+  border-bottom: 1.5px solid #232323;
+}
+
+.titleArea {
+  display: flex;
+  flex-direction: column;
+}
+
+.sectionTitle {
+  font-family: var(--font-body), sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: #1a1a1a;
+  line-height: 1.2;
+}
+
+.sectionSubtitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: #555555;
+}
+
+/* Cards Grid */
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 18px;
+}
+
+@media (min-width: 680px) {
+  .cardsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (min-width: 1080px) {
+  .cardsGrid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+  }
+}
+
+/* Peek Row for Extra Levels (like HSK 7-9 preview) */
+.peekRow {
+  margin-top: 22px;
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 18px;
+  opacity: 0.85;
+}
+
+@media (min-width: 680px) {
+  .peekRow {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (min-width: 1080px) {
+  .peekRow {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+  }
+}

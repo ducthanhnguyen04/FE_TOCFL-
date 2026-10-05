@@ -1,0 +1,184 @@
+.sidebar {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    border-right: 1.5px solid #222222;
+    padding: 12px 6px;
+    gap: 8px;
+    background-color: rgba(250, 248, 240, 0.7);
+    min-height: calc(100vh - var(--header-height));
+    position: sticky;
+    top: var(--header-height);
+    z-index: 40;
+  }
+}
+
+.menuList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.menuItem {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+.menuBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 76px;
+  min-height: 60px;
+  padding: 6px 4px;
+  border-radius: var(--sketch-radius);
+  transition: all 0.16s ease;
+  position: relative;
+  color: #3a3a3a;
+}
+
+.menuBtn:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+  color: #111;
+  transform: translateY(-1px);
+}
+
+/* Active State: Hand-drawn card like in image */
+.menuBtnActive {
+  background-color: #eee7d8;
+  border: 2px solid #232323;
+  border-radius: var(--sketch-radius);
+  box-shadow: 2px 2px 0px #232323;
+  color: #111;
+  font-weight: 700;
+}
+
+.menuBtnActive:hover {
+  background-color: #e8dfcd;
+  transform: translateY(-1px);
+  box-shadow: 2.5px 2.5px 0px #232323;
+}
+
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 3px;
+}
+
+.labelWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 10.5px;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+.label {
+  font-weight: 600;
+  text-align: center;
+}
+
+.arrow {
+  font-size: 11px;
+  line-height: 1;
+  margin-top: 2px;
+  color: #666;
+}
+
+.bottomSpacer {
+  margin-top: auto;
+  width: 100%;
+}
+
+/* Floating Submenu */
+.submenuFloating {
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background-color: #faf6ea;
+  border: 1.5px solid #222;
+  border-radius: var(--sketch-radius);
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.2);
+  padding: 10px 16px;
+  gap: 20px;
+  z-index: 100;
+  white-space: nowrap;
+  animation: slideInSubmenu 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideInSubmenu {
+  from {
+    opacity: 0;
+    transform: translate(-10px, -50%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, -50%) scale(1);
+  }
+}
+
+.subMenuItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: transparent;
+  color: #555;
+  transition: all 0.15s ease;
+  min-width: 60px;
+}
+
+.subMenuItem:hover {
+  color: #111;
+  transform: translateY(-1px);
+}
+
+.subMenuItemActive {
+  color: #111;
+  font-weight: 700;
+}
+
+.subMenuItemActive svg {
+  color: #df2a22;
+}
+
+.subMenuLabel {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.subMenuBadge {
+  position: absolute;
+  top: -12px;
+  left: 0;
+  background-color: #f5a623;
+  color: #111;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: var(--sketch-radius);
+  white-space: nowrap;
+  box-shadow: 1px 1.5px 0px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+}

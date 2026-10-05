@@ -1,0 +1,142 @@
+.heroSection {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 28px;
+}
+
+.greetingHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.mascotIcon {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: gentleBob 2.8s ease-in-out infinite alternate;
+}
+
+@keyframes gentleBob {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  100% {
+    transform: translateY(-4px) rotate(4deg);
+  }
+}
+
+.heading {
+  font-family: var(--font-body), sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  color: #1a1a1a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 600px) {
+  .heading {
+    font-size: 22px;
+  }
+}
+
+/* Highlight badge for the word "bạn" */
+.highlightWord {
+  display: inline-block;
+  background-color: #f1cf5b;
+  color: #1a1a1a;
+  padding: 1px 12px;
+  border-radius: var(--sketch-radius);
+  border: 2px solid #232323;
+  box-shadow: 2px 2px 0px #232323;
+  line-height: 1.25;
+  font-weight: 800;
+}
+
+.waveEmoji {
+  font-size: 24px;
+  display: inline-block;
+}
+
+/* Description text */
+.introText {
+  color: #444;
+  font-size: 14.5px;
+  line-height: 1.65;
+  max-width: 900px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+@media (max-width: 600px) {
+  .introText {
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
+}
+
+.learnMoreLink {
+  color: #1a1a1a;
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 2.5px;
+  transition: color 0.15s ease;
+}
+
+.learnMoreLink:hover {
+  color: #df2a22;
+}
+
+/* Community group CTA */
+.communityRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.communityLabel {
+  font-size: 14px;
+  color: #444;
+  font-weight: 500;
+}
+
+.communityBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background-color: #faf7ee;
+  border: 2px solid #232323;
+  border-radius: var(--sketch-radius);
+  box-shadow: 2px 2px 0px #232323;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a1a1a;
+  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.communityBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 3px 3px 0px #232323;
+  background-color: #fff9e6;
+}
+
+.communityBtn:active {
+  transform: translateY(1px);
+  box-shadow: 1px 1px 0px #232323;
+}
+
+.pinIcon {
+  font-size: 14px;
+}

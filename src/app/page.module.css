@@ -1,0 +1,73 @@
+.pageWrapper {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.bodyLayout {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.scrollArea {
+  flex: 1;
+  overflow-y: auto;
+  height: 100%;
+}
+
+.mainContent {
+  position: relative;
+  min-width: 0; /* Prevents overflow issues in flex layouts */
+  padding: 20px 16px 60px;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .mainContent {
+    padding: 26px 28px 70px;
+  }
+}
+
+@media (min-width: 1080px) {
+  .mainContent {
+    padding: 28px 40px 80px;
+  }
+}
+
+/* Toast Alert Notification */
+.toast {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #272727;
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: var(--sketch-radius);
+  border: 1.5px solid #111;
+  box-shadow: 2px 3px 0px rgba(0, 0, 0, 0.4);
+  font-size: 13.5px;
+  font-weight: 600;
+  z-index: 150;
+  animation: slideDownToast 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@keyframes slideDownToast {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}

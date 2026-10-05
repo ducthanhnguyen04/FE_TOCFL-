@@ -1,0 +1,106 @@
+.cardContainer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background-color: #faf7ee;
+  /* Remove old borders to allow crossing borders */
+  /* border: 2px solid #232323; */
+  /* border-radius: 14px 16px 12px 15px / 16px 13px 15px 12px; */
+  /* overflow: hidden; */
+  box-shadow: 3px 3.5px 0px #232323;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  user-select: none;
+  width: 100%;
+}
+
+.cardContainer:hover {
+  transform: translateY(-5px);
+  box-shadow: 4px 7px 0px #232323;
+}
+
+.cardContainer:active {
+  transform: translateY(1px);
+  box-shadow: 1.5px 2px 0px #232323;
+}
+
+/* Top Section: Red textured chalkboard / crayon banner */
+.topBanner {
+  position: relative;
+  height: 142px;
+  background-color: #c03634;
+  /* Authentic chalk/crayon stippled texture */
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0%, transparent 60%),
+    radial-gradient(circle at 20% 80%, rgba(0, 0, 0, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.08) 0%, transparent 40%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.09'/%3E%3C/svg%3E");
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  overflow: hidden;
+  border-radius: 14px 16px 0 0 / 16px 13px 0 0;
+}
+
+@media (max-width: 600px) {
+  .topBanner {
+    height: 125px;
+  }
+}
+
+/* Red inner subtle vignette */
+.topBanner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-bottom: 2px solid #232323;
+  pointer-events: none;
+}
+
+.cardTitle {
+  font-family: var(--font-doodle), cursive, sans-serif;
+  font-size: 34px;
+  font-weight: 800;
+  color: #faebba;
+  letter-spacing: 0.5px;
+  text-align: center;
+  text-shadow: 1.5px 1.5px 0px rgba(40, 20, 20, 0.6);
+  z-index: 2;
+  transition: transform 0.2s ease;
+}
+
+.cardContainer:hover .cardTitle {
+  transform: scale(1.04);
+}
+
+@media (max-width: 600px) {
+  .cardTitle {
+    font-size: 29px;
+  }
+}
+
+/* Bottom Strip: Mustard / Kraft paper with stats */
+.bottomStrip {
+  background-color: #e5b35e;
+  padding: 11px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 44px;
+  border-radius: 0 0 12px 15px / 0 0 15px 12px;
+}
+
+.statsText {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #1a1a1a;
+  letter-spacing: 0.2px;
+}
+
+@media (max-width: 600px) {
+  .statsText {
+    font-size: 12.5px;
+  }
+}

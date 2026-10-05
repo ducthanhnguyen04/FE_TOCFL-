@@ -1,0 +1,242 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(20, 20, 20, 0.45);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  display: flex;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.overlayOpen {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.drawer {
+  width: 280px;
+  max-width: 85vw;
+  height: 100%;
+  background-color: #faf7ee;
+  background-image: 
+    linear-gradient(to right, rgba(0, 0, 0, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.045) 1px, transparent 1px);
+  background-size: 20px 20px;
+  border-right: 2px solid #222;
+  box-shadow: 4px 0px 16px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(-100%);
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow-y: auto;
+}
+
+.drawerOpen {
+  transform: translateX(0);
+}
+
+.drawerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 2px solid #232323;
+  background-color: #f4eedd;
+}
+
+.logoArea {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chineseBadge {
+  background-color: #df2a22;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 13px;
+  padding: 2px 6px;
+  border-radius: var(--sketch-radius);
+}
+
+.brandTitle {
+  font-family: var(--font-doodle), cursive, sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: #222;
+}
+
+.closeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1.5px solid #222;
+  border-radius: var(--sketch-radius);
+  background-color: #faf7ee;
+  box-shadow: 1.5px 1.5px 0px #222;
+  color: #222;
+  transition: transform 0.1s ease;
+}
+
+.closeBtn:active {
+  transform: scale(0.95);
+}
+
+.userCard {
+  margin: 14px 16px 6px;
+  padding: 12px 14px;
+  background-color: #f1ebd8;
+  border: 2px solid #232323;
+  border-radius: var(--sketch-radius);
+  box-shadow: 2px 2px 0px #232323;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.userName {
+  font-weight: 700;
+  font-size: 14px;
+  color: #222;
+}
+
+.userStatus {
+  font-size: 11.5px;
+  color: #666;
+}
+
+.menuList {
+  list-style: none;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.menuItemBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: var(--sketch-radius);
+  font-size: 14px;
+  font-weight: 600;
+  color: #2d2d2d;
+  transition: all 0.15s ease;
+  text-align: left;
+}
+
+.menuItemBtn:hover {
+  background-color: #ede5d3;
+}
+
+.menuItemActive {
+  background-color: #ede4d1;
+  border: 2px solid #232323;
+  box-shadow: 2px 2px 0px #232323;
+  color: #111;
+  font-weight: 700;
+}
+
+.menuLabel {
+  flex: 1;
+}
+
+.chevron {
+  font-size: 13px;
+  color: #888;
+}
+
+.drawerFooter {
+  margin-top: auto;
+  padding: 16px;
+  border-top: 1px solid #e2ddd3;
+  font-size: 11px;
+  color: #888;
+  text-align: center;
+}
+
+/* Mobile Submenu */
+.mobileMenuItem {
+  display: flex;
+  flex-direction: column;
+}
+
+.mobileSubmenu {
+  display: flex;
+  flex-direction: column;
+  padding-left: 20px;
+  margin-top: 4px;
+  gap: 4px;
+  animation: slideDownSubmenu 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideDownSubmenu {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mobileSubMenuItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px;
+  border-radius: var(--sketch-radius);
+  background-color: transparent;
+  color: #555;
+  font-size: 13.5px;
+  font-weight: 600;
+  transition: all 0.15s ease;
+  text-align: left;
+}
+
+.mobileSubMenuItem:hover {
+  background-color: rgba(0,0,0,0.03);
+  color: #111;
+}
+
+.mobileSubMenuItemActive {
+  color: #111;
+  font-weight: 700;
+}
+
+.mobileSubMenuItemActive svg {
+  color: #df2a22;
+}
+
+.mobileSubLabel {
+  flex: 1;
+}
+
+.mobileSubBadge {
+  position: absolute;
+  top: 0;
+  left: 20px;
+  background-color: #f5a623;
+  color: #111;
+  font-size: 8.5px;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: var(--sketch-radius);
+  white-space: nowrap;
+  box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+}
