@@ -91,8 +91,9 @@
   font-family: "KaiTi", "STKaiti", "BiauKai", serif;
   color: #1a1a1a;
   cursor: pointer;
-  transition: all 0.1s ease;
+  transition: transform 0.1s ease, background-color 0.1s ease, box-shadow 0.1s ease;
   position: relative;
+  border-radius: var(--sketch-radius);
 }
 
 .charBox:hover {

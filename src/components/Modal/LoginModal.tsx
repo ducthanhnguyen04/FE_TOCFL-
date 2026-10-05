@@ -32,11 +32,10 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
           <svg width="60" height="60" viewBox="0 0 54 54" fill="none">
             {/* Mascot Face */}
             <circle cx="28" cy="30" r="18" fill="#d82a24" stroke="#222" strokeWidth="2" />
-            {/* Star */}
-            <polygon
-              points="20,20 22,25 27,25 23,28 25,33 20,30 15,33 17,28 13,25 18,25"
-              fill="#ffd700"
-            />
+            {/* Taiwan Flag Motif */}
+            <path d="M 10 30 A 18 18 0 0 1 28 12 L 28 30 Z" fill="#000095" />
+            <circle cx="20" cy="20" r="2" fill="#fff" />
+            <path d="M 20 16 L 20 24 M 16 20 L 24 20 M 17 17 L 23 23 M 17 23 L 23 17" stroke="#fff" strokeWidth="1" />
             {/* Sunglasses */}
             <path
               d="M 17 26 Q 22 25 28 26 Q 34 25 39 26 L 39 29 Q 34 32 28 29 Q 22 32 17 29 Z"

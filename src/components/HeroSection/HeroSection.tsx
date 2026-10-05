@@ -18,13 +18,11 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
       <div className={styles.greetingHeader}>
         <div className={styles.mascotIcon}>
           <svg viewBox="0 0 40 40" width="36" height="36">
-            {/* Red Circle with Yellow Star / Sunglasses Mascot */}
+            {/* Taiwan Flag Motif / Sunglasses Mascot */}
             <circle cx="20" cy="20" r="18" fill="#d82924" stroke="#222" strokeWidth="2" />
-            <polygon
-              points="20,7 23,16 32,16 25,22 28,30 20,25 12,30 15,22 8,16 17,16"
-              fill="#fed636"
-              opacity="0.25"
-            />
+            <path d="M 2 20 A 18 18 0 0 1 20 2 L 20 20 Z" fill="#000095" opacity="0.6" />
+            <circle cx="14" cy="14" r="2.5" fill="#fff" opacity="0.6" />
+            <path d="M 14 9 L 14 19 M 9 14 L 19 14 M 10.5 10.5 L 17.5 17.5 M 10.5 17.5 L 17.5 10.5" stroke="#fff" strokeWidth="1" opacity="0.6" />
             {/* Cool Sunglasses */}
             <path
               d="M 9 17 Q 14 15 19 17 Q 19 23 14 24 Q 9 23 9 17 Z"

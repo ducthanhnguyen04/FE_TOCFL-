@@ -52,7 +52,7 @@ export const HanziList: React.FC<HanziListProps> = () => {
       <div className={`${styles.gridContainer} sketch-cross`}>
         <div className={styles.grid}>
           {characters.map((char, index) => (
-            <div key={index} className={`${styles.charBox} sketch-cross`}>
+            <div key={index} className={styles.charBox}>
               {char}
             </div>
           ))}

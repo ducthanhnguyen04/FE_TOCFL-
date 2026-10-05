@@ -40,11 +40,10 @@ export const HeartMascot: React.FC<{ onClick?: () => void }> = ({ onClick }) => 
 
         {/* Mascot Face */}
         <circle cx="28" cy="30" r="18" fill="#d82a24" stroke="#222" strokeWidth="2" />
-        {/* Star */}
-        <polygon
-          points="20,20 22,25 27,25 23,28 25,33 20,30 15,33 17,28 13,25 18,25"
-          fill="#ffd700"
-        />
+        {/* Taiwan Flag Motif */}
+        <path d="M 10 30 A 18 18 0 0 1 28 12 L 28 30 Z" fill="#000095" />
+        <circle cx="20" cy="20" r="2" fill="#fff" />
+        <path d="M 20 16 L 20 24 M 16 20 L 24 20 M 17 17 L 23 23 M 17 23 L 23 17" stroke="#fff" strokeWidth="1" />
         {/* Eyes (happy curves) */}
         <path
           d="M 27 27 Q 31 23 35 27"
@@ -86,12 +85,11 @@ export const RobotMascot: React.FC<{ onClick?: () => void }> = ({ onClick }) => 
       title="Trợ lý AI Nhai TOCFL - Hỏi đáp 24/7"
     >
       <svg width="60" height="54" viewBox="0 0 70 60" fill="none">
-        {/* Flag Ball in Background */}
+        {/* Flag Ball in Background (Taiwan) */}
         <circle cx="50" cy="38" r="14" fill="#d82a24" stroke="#222" strokeWidth="2" />
-        <polygon
-          points="46,31 47,34 50,34 48,36 49,39 46,37 43,39 44,36 42,34 45,34"
-          fill="#ffd700"
-        />
+        <path d="M 36 38 A 14 14 0 0 1 50 24 L 50 38 Z" fill="#000095" />
+        <circle cx="43" cy="31" r="1.5" fill="#fff" />
+        <path d="M 43 28 L 43 34 M 40 31 L 46 31 M 41 29 L 45 33 M 41 33 L 45 29" stroke="#fff" strokeWidth="0.8" />
 
         {/* AI Robot */}
         {/* Antenna */}
