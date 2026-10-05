@@ -1,21 +1,51 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { Zap, LogIn } from 'lucide-react';
+import { Zap, LogIn, LogOut, Bell, Settings, FileText } from 'lucide-react';
+import { useUser } from '@/providers/UserProvider';
 import styles from './Header.module.css';
 
 interface HeaderProps {
   onToggleMobileDrawer: () => void;
   streakCount?: number;
   onLoginClick?: () => void;
+  onSettingsClick?: () => void;
 }
-
 export const Header: React.FC<HeaderProps> = ({
   onToggleMobileDrawer,
   streakCount = 0,
   onLoginClick,
+  onSettingsClick,
 }) => {
+  const { user, logout } = useUser();
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const notifRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (dropdownRef.current && !dropdownRef.current.contains(target)) {
+        setShowDropdown(false);
+      }
+      if (notifRef.current && !notifRef.current.contains(target)) {
+        setShowNotifications(false);
+      }
+    };
+    if (showDropdown || showNotifications) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showDropdown, showNotifications]);
+
+  const handleLogout = async () => {
+    await logout();
+  };
+
   return (
     <header className={styles.header}>
       {/* Left: Mobile Menu Toggle & Brand Logo */}
@@ -49,14 +79,88 @@ export const Header: React.FC<HeaderProps> = ({
           <span>{streakCount}</span>
         </div>
 
-        <button
-          type="button"
-          className={styles.loginBtn}
-          onClick={onLoginClick}
-        >
-          <LogIn className={styles.loginIcon} />
-          <span>Đăng nhập</span>
-        </button>
+        {user ? (
+          <div className={styles.userActions}>
+            <div className={styles.notifContainer} ref={notifRef}>
+              <button 
+                className={`${styles.bellBtn} sketch-cross`}
+                onClick={() => setShowNotifications(!showNotifications)}
+              >
+                <Bell size={16} strokeWidth={2.5} />
+              </button>
+              
+              {showNotifications && (
+                <div className={`${styles.notifDropdown} sketch-box`}>
+                  <div className={styles.notifHeader}>
+                    Thông báo
+                  </div>
+                  <div className={styles.notifBody}>
+                    <Bell size={32} strokeWidth={1.5} className={styles.emptyBellIcon} />
+                    <span className={styles.emptyText}>Chưa có thông báo</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className={styles.avatarContainer} ref={dropdownRef}>
+              <div 
+                className={`${styles.avatarWrapper} sketch-circle`} 
+                onClick={() => setShowDropdown(!showDropdown)}
+              >
+                {user.user_metadata?.avatar_url ? (
+                  <img 
+                    src={user.user_metadata.avatar_url} 
+                    alt="Avatar" 
+                    className={styles.userAvatar}
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  <div className={styles.defaultAvatar}>
+                    {user.email?.charAt(0).toUpperCase()}
+                  </div>
+                )}
+              </div>
+
+              {showDropdown && (
+                <div className={`${styles.dropdownMenu} sketch-box`}>
+                  <div className={styles.dropdownHeader}>
+                    <span className={styles.dropdownName}>{user.user_metadata?.full_name || 'Người dùng'}</span>
+                    <span className={styles.dropdownEmail}>{user.email}</span>
+                  </div>
+                  <div className={styles.dropdownBody}>
+                    <button 
+                      className={styles.dropdownItem}
+                      onClick={() => {
+                        setShowDropdown(false);
+                        onSettingsClick?.();
+                      }}
+                    >
+                      <Settings size={18} strokeWidth={2} />
+                      <span>Cài đặt tài khoản</span>
+                    </button>
+                    <button className={styles.dropdownItem}>
+                      <FileText size={18} strokeWidth={2} />
+                      <span>Điều khoản & chính sách</span>
+                    </button>
+                    <button className={styles.logoutBtn} onClick={handleLogout}>
+                      <LogOut size={18} strokeWidth={2} />
+                      <span>Đăng xuất</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          <button
+            type="button"
+            className={styles.loginBtn}
+            onClick={onLoginClick}
+          >
+            <LogIn className={styles.loginIcon} />
+            <span>Đăng nhập</span>
+          </button>
+        )}
       </div>
     </header>
   );

@@ -7,6 +7,7 @@ export { TOCFLCard } from './TOCFLCard/TOCFLCard';
 export { Watermark } from './Watermark/Watermark';
 export { HeartMascot, RobotMascot } from './Mascots/Mascots';
 export { ChatWidget } from './ChatWidget/ChatWidget';
+export { SettingsModal } from './Modal/SettingsModal';
 export { CardDetailModal } from './Modal/CardDetailModal';
 export { LoginModal } from './Modal/LoginModal';
 export { CourseDetail } from './CourseDetail/CourseDetail';

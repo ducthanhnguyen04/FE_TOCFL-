@@ -62,7 +62,19 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 
         {/* Social Logins */}
         <div className={styles.socialGroup}>
-          <button className={`${styles.socialBtn} sketch-cross`}>
+          <button 
+            className={`${styles.socialBtn} sketch-cross`}
+            onClick={async () => {
+              const { createClient } = await import('@/lib/supabase/client');
+              const supabase = createClient();
+              supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                  redirectTo: `${window.location.origin}/auth/callback`,
+                }
+              });
+            }}
+          >
             <span style={{ color: '#4285F4', fontWeight: 'bold', fontSize: '15px' }}>G</span>
             <span>Đăng nhập bằng Google</span>
           </button>

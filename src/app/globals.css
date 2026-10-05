@@ -57,6 +57,29 @@
   z-index: 10;
 }
 
+/* Sketched Hand-drawn Circular effect */
+.sketch-circle {
+  position: relative;
+}
+.sketch-circle::before {
+  content: "";
+  position: absolute;
+  inset: -2px -4px;
+  border: 2px solid #232323;
+  border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+  pointer-events: none;
+  z-index: 10;
+}
+.sketch-circle::after {
+  content: "";
+  position: absolute;
+  inset: -4px -2px;
+  border: 1.5px solid #232323;
+  border-radius: 60% 40% 30% 70% / 50% 60% 40% 50%;
+  pointer-events: none;
+  z-index: 10;
+}
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -162,3 +185,37 @@ a {
     box-shadow: none;
   }
 }
+
+:root.dark {
+  --bg-paper: #1c1c1a;
+  --grid-line: rgba(255, 255, 255, 0.05);
+  --border-sketch: #e2dfd5;
+  --text-primary: #e2dfd5;
+  --text-secondary: #b3b3b3;
+  --text-muted: #7e7e7e;
+  
+  /* Primary TOCFL Colors Darkened */
+  --card-red-top: #a62a2a;
+  --card-red-texture: #851c1c;
+  --card-cream-text: #1c1c1a;
+  --card-yellow-bottom: #b58d4a;
+  --card-yellow-border: #e2dfd5;
+  
+  /* Accents */
+  --highlight-yellow: #a69046;
+  --btn-dark: #e2dfd5;
+  --btn-dark-hover: #ffffff;
+  --watermark-red: #8a261f;
+  --sidebar-active-bg: #2a2825;
+}
+
+:root.dark .paper-grid-bg {
+  background-image: 
+    linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+}
+
+:root.dark button {
+  color: var(--text-primary);
+}
+

@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useUser } from '@/providers/UserProvider';
 import styles from './HeroSection.module.css';
 
 interface HeroSectionProps {
@@ -12,6 +13,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   onLearnMore,
   onJoinCommunity,
 }) => {
+  const { user } = useUser();
+  const displayName = user?.user_metadata?.full_name || 'bạn';
+
   return (
     <section className={styles.heroSection}>
       {/* Greeting Title */}
@@ -49,7 +53,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
         <h1 className={styles.heading}>
           <span>Chào</span>
-          <span className={styles.highlightWord}>bạn</span>
+          <span className={styles.highlightWord}>{displayName}</span>
           <span className={styles.waveEmoji} role="img" aria-label="Waving hand">
             👏
           </span>

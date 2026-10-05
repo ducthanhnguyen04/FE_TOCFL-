@@ -13,6 +13,7 @@ import {
   RobotMascot,
   ChatWidget,
   LoginModal,
+  SettingsModal,
   CourseDetail,
 } from '@/components';
 import { TOCFLLevelItem, MenuItem } from '@/types';
@@ -27,6 +28,7 @@ export default function ClientPage({ courseId }: { courseId?: string }) {
   const [streakCount, setStreakCount] = useState(0);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -36,6 +38,10 @@ export default function ClientPage({ courseId }: { courseId?: string }) {
   };
 
   const handleSelectMenu = (item: MenuItem) => {
+    if (item.id === 'settings') {
+      setIsSettingsModalOpen(true);
+      return;
+    }
     setActiveMenuId(item.id);
     showToast(`Đã chọn mục: ${item.label}`);
   };
@@ -82,6 +88,7 @@ export default function ClientPage({ courseId }: { courseId?: string }) {
         onToggleMobileDrawer={() => setIsMobileDrawerOpen(true)}
         streakCount={streakCount}
         onLoginClick={handleLoginClick}
+        onSettingsClick={() => setIsSettingsModalOpen(true)}
       />
 
       {/* Body with Sidebar & Main Content */}
@@ -138,6 +145,12 @@ export default function ClientPage({ courseId }: { courseId?: string }) {
       <LoginModal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
+      />
+
+      {/* Settings Modal */}
+      <SettingsModal
+        isOpen={isSettingsModalOpen}
+        onClose={() => setIsSettingsModalOpen(false)}
       />
     </div>
   );

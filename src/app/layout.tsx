@@ -21,15 +21,26 @@ export const metadata: Metadata = {
   description: 'Website tự học tiếng Đài Loan và luyện thi TOCFL 3.0 miễn phí từ cấp 1 đến cấp 9 với giáo trình từ vựng, ngữ pháp, pinyin và shadowing.',
 };
 
-export default function RootLayout({
+import { UserProvider } from '@/providers/UserProvider';
+import { ThemeProvider } from '@/providers/ThemeProvider';
+import { createClient } from '@/lib/supabase/server';
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
   return (
     <html lang="vi" className={`${beVietnamPro.variable} ${patrickHand.variable}`} suppressHydrationWarning>
       <body className="paper-grid-bg" suppressHydrationWarning>
-        <div id="app-root">{children}</div>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+          <UserProvider initialUser={user}>
+            <div id="app-root">{children}</div>
+          </UserProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
