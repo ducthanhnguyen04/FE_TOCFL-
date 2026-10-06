@@ -5,6 +5,7 @@ import { TOCFLLevelItem } from '@/types';
 import { VocabList } from './VocabList';
 import { GrammarList } from './GrammarList';
 import { HanziList } from './HanziList';
+import { useRouter, useParams } from 'next/navigation';
 
 interface CourseDetailProps {
   item: TOCFLLevelItem;
@@ -21,7 +22,13 @@ const mockLessons = [
 
 export const CourseDetail: React.FC<CourseDetailProps> = ({ item, onBack }) => {
   const [activeTab, setActiveTab] = useState<'vocab' | 'grammar' | 'hanzi'>('vocab');
+  const router = useRouter();
+  const params = useParams();
   
+  const handleLessonSelect = (lessonId: number) => {
+    router.push(`/course/${params.id}/lesson/${lessonId}`);
+  };
+
   return (
     <div className={styles.courseDetailWrapper} style={{ animation: 'fadeIn 0.3s ease' }}>
       <button onClick={onBack} className={styles.backBtn}>
@@ -106,14 +113,14 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ item, onBack }) => {
           <div className={styles.lessonsSection}>
             <h3 className={styles.sectionLabel}>BÀI HỌC</h3>
             <div className={styles.lessonsList}>
-              {activeTab === 'vocab' && <VocabList lessons={mockLessons} />}
-              {activeTab === 'grammar' && <GrammarList lessons={mockLessons} />}
+              {activeTab === 'vocab' && <VocabList lessons={mockLessons} onSelect={handleLessonSelect} />}
+              {activeTab === 'grammar' && <GrammarList lessons={mockLessons} onSelect={handleLessonSelect} />}
             </div>
           </div>
         </>
       ) : (
         <div className={styles.lessonsSection}>
-          <HanziList lessons={mockLessons} />
+          <HanziList lessons={mockLessons} onSelect={handleLessonSelect} />
         </div>
       )}
     </div>

@@ -10,13 +10,13 @@ interface HeaderProps {
   onToggleMobileDrawer: () => void;
   streakCount?: number;
   onLoginClick?: () => void;
-  onSettingsClick?: () => void;
+  onAccountSettingsClick?: () => void;
 }
 export const Header: React.FC<HeaderProps> = ({
   onToggleMobileDrawer,
   streakCount = 0,
   onLoginClick,
-  onSettingsClick,
+  onAccountSettingsClick,
 }) => {
   const { user, logout } = useUser();
   const [showDropdown, setShowDropdown] = useState(false);
@@ -132,7 +132,7 @@ export const Header: React.FC<HeaderProps> = ({
                       className={styles.dropdownItem}
                       onClick={() => {
                         setShowDropdown(false);
-                        onSettingsClick?.();
+                        onAccountSettingsClick?.();
                       }}
                     >
                       <Settings size={18} strokeWidth={2} />

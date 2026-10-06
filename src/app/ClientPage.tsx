@@ -14,13 +14,15 @@ import {
   ChatWidget,
   LoginModal,
   SettingsModal,
+  SettingsView,
   CourseDetail,
+  LessonDetail,
 } from '@/components';
 import { TOCFLLevelItem, MenuItem } from '@/types';
 import { TOCFL_LEVELS } from '@/data/tocflData';
 import { useRouter } from 'next/navigation';
 
-export default function ClientPage({ courseId }: { courseId?: string }) {
+export default function ClientPage({ courseId, lessonId }: { courseId?: string; lessonId?: string }) {
   const router = useRouter();
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
   const [activeMenuId, setActiveMenuId] = useState('home');
@@ -43,7 +45,6 @@ export default function ClientPage({ courseId }: { courseId?: string }) {
       return;
     }
     setActiveMenuId(item.id);
-    showToast(`Đã chọn mục: ${item.label}`);
   };
 
   const handleLoginClick = () => {
@@ -88,7 +89,7 @@ export default function ClientPage({ courseId }: { courseId?: string }) {
         onToggleMobileDrawer={() => setIsMobileDrawerOpen(true)}
         streakCount={streakCount}
         onLoginClick={handleLoginClick}
-        onSettingsClick={() => setIsSettingsModalOpen(true)}
+        onAccountSettingsClick={() => setActiveMenuId('account_settings')}
       />
 
       {/* Body with Sidebar & Main Content */}
@@ -111,11 +112,19 @@ export default function ClientPage({ courseId }: { courseId?: string }) {
             {/* Vietnam Watermark & Highlighter BG */}
             <Watermark />
 
-            {derivedSelectedLevel ? (
+            {lessonId && courseId ? (
+              <LessonDetail 
+                courseId={courseId} 
+                lessonId={lessonId} 
+                onBack={() => router.push(`/course/${courseId}`)}
+              />
+            ) : derivedSelectedLevel ? (
               <CourseDetail
                 item={derivedSelectedLevel}
                 onBack={() => router.push('/')}
               />
+            ) : activeMenuId === 'account_settings' ? (
+              <SettingsView />
             ) : (
               <>
                 {/* Hero Greeting Section */}

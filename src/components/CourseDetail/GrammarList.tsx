@@ -11,15 +11,17 @@ interface LessonItem {
 
 interface GrammarListProps {
   lessons: LessonItem[];
+  onSelect?: (id: number) => void;
 }
 
-export const GrammarList: React.FC<GrammarListProps> = ({ lessons }) => {
+export const GrammarList: React.FC<GrammarListProps> = ({ lessons, onSelect }) => {
   return (
     <div className={styles.lessonsList}>
       {lessons.map((lesson) => (
         <button
           key={lesson.id}
           className={`${styles.lessonCard} sketch-cross ${lesson.isLocked ? styles.lessonLocked : ''}`}
+          onClick={() => !lesson.isLocked && onSelect?.(lesson.id)}
         >
           <div className={`${styles.lessonNumber} sketch-cross`}>{lesson.id}</div>
           <div className={styles.lessonInfo}>

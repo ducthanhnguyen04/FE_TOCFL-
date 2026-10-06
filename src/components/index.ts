@@ -10,5 +10,7 @@ export { ChatWidget } from './ChatWidget/ChatWidget';
 export { SettingsModal } from './Modal/SettingsModal';
 export { CardDetailModal } from './Modal/CardDetailModal';
 export { LoginModal } from './Modal/LoginModal';
+export { SettingsView } from './SettingsView/SettingsView';
 export { CourseDetail } from './CourseDetail/CourseDetail';
+export { LessonDetail } from './LessonDetail/LessonDetail';
 export { PracticeSheetModal } from './Modal/PracticeSheetModal';
