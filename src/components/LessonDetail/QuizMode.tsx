@@ -42,7 +42,7 @@ export const QuizMode: React.FC<QuizModeProps> = ({ vocabs }) => {
   };
 
   // Fake options based on quizType
-  const getOptions = () => {
+  const getOptions = (): { id: number; text: string; isHanzi?: boolean }[] => {
     if (quizType === 'pinyin') {
       return [
         { id: 1, text: 'nǐmen' },
