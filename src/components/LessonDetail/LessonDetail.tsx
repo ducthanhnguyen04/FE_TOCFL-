@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, Eye, RefreshCw, Play, Shuffle, Settings, Volume2, Flag, Star, Printer, X, Check } from 'lucide-react';
 import styles from './LessonDetail.module.css';
 import { QuizMode } from './QuizMode';
+import { TypingMode } from './TypingMode';
+import { AutoPlayModal, AutoPlaySettings } from '../Modal/AutoPlayModal';
 
 interface LessonDetailProps {
   courseId: string;
@@ -16,8 +18,6 @@ const studyModes = [
   { id: 'typing', title: 'Gõ từ', status: 'Chưa học' },
   { id: 'reading', title: 'Đọc hiểu', status: 'Chưa học' },
   { id: 'listening', title: 'Nghe ghép câu', status: 'Chưa học' },
-  { id: 'hanzi_dance', title: 'Hanzi Dance', status: 'Chưa học' },
-  { id: 'arena', title: 'Đấu trí', status: 'Xếp hạng' },
 ];
 
 export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, onBack }) => {
@@ -27,6 +27,9 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
   const [slideDirection, setSlideDirection] = useState<'left' | 'right' | null>(null);
   const [isFlipped, setIsFlipped] = useState(false);
   const [vocabs, setVocabs] = useState<any[]>([]);
+  const [isAutoPlayModalOpen, setIsAutoPlayModalOpen] = useState(false);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(false);
+  const autoPlayRef = React.useRef<boolean>(false);
   const [lessonName, setLessonName] = useState('Đang tải...');
 
   React.useEffect(() => {
@@ -83,30 +86,100 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
     }
   };
 
-  const handleSpeak = (text: string, e?: React.MouseEvent) => {
+  const handleSpeak = (text: string, e?: React.MouseEvent): Promise<void> => {
     if (e) e.stopPropagation();
-    if (!text || typeof window === 'undefined') return;
+    return new Promise((resolve) => {
+      if (!text || typeof window === 'undefined') {
+        resolve();
+        return;
+      }
+      
+      // Sử dụng API Google Dịch (GTX) để đọc chuẩn ngữ điệu và biến điệu (Tone Sandhi)
+      const url = `https://translate.googleapis.com/translate_tts?client=gtx&ie=UTF-8&tl=zh-TW&q=${encodeURIComponent(text)}`;
+      const audio = new Audio(url);
+      
+      audio.onended = () => resolve();
+      audio.onerror = () => resolve();
+      
+      audio.play().catch((err) => {
+        console.warn("Lỗi Google TTS, tự động dùng giọng máy tính thay thế:", err);
+        // Fallback nếu mạng lỗi
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        const voices = window.speechSynthesis.getVoices();
+        
+        let bestVoice = voices.find(v => v.name.includes('HsiaoChen') || v.name.includes('HsiaoYu') || v.name.includes('Mei-Jia')); 
+        if (!bestVoice) bestVoice = voices.find(v => v.lang === 'zh-TW'); 
+        if (!bestVoice) bestVoice = voices.find(v => v.name.includes('Xiaoxiao') || v.name.includes('Ting-Ting')); 
+        if (!bestVoice) bestVoice = voices.find(v => v.lang.includes('zh')); 
+        
+        if (bestVoice) utterance.voice = bestVoice;
+        else utterance.lang = 'zh-TW';
+        
+        utterance.rate = 0.85; 
+        utterance.onend = () => resolve();
+        utterance.onerror = () => resolve();
+        window.speechSynthesis.speak(utterance);
+      });
+    });
+  };
+
+  const startAutoPlay = async (settings: AutoPlaySettings) => {
+    setIsAutoPlayModalOpen(false);
+    setIsAutoPlaying(true);
+    autoPlayRef.current = true;
     
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
+    let currentIdx = currentIndex;
     
-    // Lấy danh sách giọng đọc của hệ điều hành
-    const voices = window.speechSynthesis.getVoices();
-    
-    // Tìm giọng xịn nhất có thể (các giọng "Online" hoặc Premium của Windows/Mac)
-    let bestVoice = voices.find(v => v.name.includes('HsiaoChen') || v.name.includes('HsiaoYu') || v.name.includes('Mei-Jia')); 
-    if (!bestVoice) bestVoice = voices.find(v => v.lang === 'zh-TW'); // Fallback Đài Loan
-    if (!bestVoice) bestVoice = voices.find(v => v.name.includes('Xiaoxiao') || v.name.includes('Ting-Ting')); // Fallback Trung Quốc xịn
-    if (!bestVoice) bestVoice = voices.find(v => v.lang.includes('zh')); // Fallback bất kỳ giọng tiếng Trung nào
-    
-    if (bestVoice) {
-      utterance.voice = bestVoice;
-    } else {
-      utterance.lang = 'zh-TW';
+    while (autoPlayRef.current && currentIdx < vocabs.length) {
+      const vocab = vocabs[currentIdx];
+      setIsFlipped(false);
+      
+      for (let i = 0; i < settings.repeatCount; i++) {
+        if (!autoPlayRef.current) break;
+        if (settings.listenVocab) {
+          await handleSpeak(vocab.hanzi);
+          if (i < settings.repeatCount - 1) {
+            await new Promise(r => setTimeout(r, 600)); // Nghỉ 0.6s giữa mỗi lần đọc
+          }
+        }
+      }
+      
+      if (!autoPlayRef.current) break;
+      await new Promise(r => setTimeout(r, settings.flipTime * 1000));
+      
+      if (!autoPlayRef.current) break;
+      setIsFlipped(true);
+      
+      if (settings.listenExample && vocab.example) {
+        for (let i = 0; i < settings.repeatCount; i++) {
+          if (!autoPlayRef.current) break;
+          // Ưu tiên đọc example (chữ Hán), nếu không có thì đọc Pinyin
+          await handleSpeak(vocab.example);
+          if (i < settings.repeatCount - 1) {
+            await new Promise(r => setTimeout(r, 800)); // Nghỉ 0.8s giữa các câu ví dụ
+          }
+        }
+      }
+      
+      if (!autoPlayRef.current) break;
+      await new Promise(r => setTimeout(r, settings.nextTime * 1000));
+      
+      if (!autoPlayRef.current) break;
+      currentIdx++;
+      if (currentIdx < vocabs.length) {
+        setSlideDirection('left');
+        setCurrentIndex(currentIdx);
+      }
     }
     
-    utterance.rate = 0.85; // Đọc chậm lại một chút xíu cho chuẩn
-    window.speechSynthesis.speak(utterance);
+    setIsAutoPlaying(false);
+    autoPlayRef.current = false;
+  };
+
+  const stopAutoPlay = () => {
+    setIsAutoPlaying(false);
+    autoPlayRef.current = false;
   };
 
   return (
@@ -145,7 +218,7 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
 
       {/* Main Container based on active mode */}
       {activeMode === 'flashcard' && (
-        <div className={`${styles.flashcardContainer} sketch-box`}>
+        <div key="flashcard" className={`${styles.flashcardContainer} sketch-box`}>
           {/* Flashcard Header */}
         <div className={styles.fcHeader}>
           <div className={styles.fcTabs}>
@@ -155,23 +228,21 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
             >
               📚 Từ vựng
             </button>
-            <button 
-              className={`${styles.fcTabBtn} ${activeTab === 'example' ? styles.fcTabActive : ''} sketch-cross`}
-              onClick={() => setActiveTab('example')}
-            >
-              📖 Ví dụ
-            </button>
           </div>
           
-          <div className={`${styles.fcCounter} sketch-cross`}>
-            {vocabs.length > 0 ? currentIndex + 1 : 0} / {vocabs.length}
+          <div className={`${styles.fcCounter} sketch-cross`} key={`counter-${currentIndex}`}>
+            <span>{vocabs.length > 0 ? currentIndex + 1 : 0}</span> / <span>{vocabs.length}</span>
           </div>
 
           <div className={styles.fcControls}>
             <button className={`${styles.fcControlBtn} sketch-cross`}><RefreshCw size={14} /> ZH → VI</button>
-            <button className={`${styles.fcControlBtn} sketch-cross`}><Play size={14} /> Tự động</button>
-            <button className={`${styles.fcControlBtn} sketch-cross`}><Shuffle size={14} /> Xáo trộn</button>
-            <button className={`${styles.fcControlBtn} sketch-cross`}><Settings size={14} /></button>
+            <button 
+              className={`${styles.fcControlBtn} sketch-cross`}
+              onClick={() => isAutoPlaying ? stopAutoPlay() : setIsAutoPlayModalOpen(true)}
+            >
+              <Play size={14} fill={isAutoPlaying ? "#d82924" : "none"} stroke={isAutoPlaying ? "#d82924" : "currentColor"} /> 
+              {isAutoPlaying ? 'Dừng phát' : 'Tự động'}
+            </button>
           </div>
         </div>
 
@@ -198,9 +269,9 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
                 ))}
               </div>
 
-              <div className={styles.vocabTag}>{currentVocab.tag}</div>
-              <div className={styles.vocabPinyin}>{currentVocab.pinyin}</div>
-              <div className={styles.flipHint}>✨ Click để lật xem nghĩa</div>
+              <div className={styles.vocabTag}><span>{currentVocab.tag}</span></div>
+              <div className={styles.vocabPinyin}><span>{currentVocab.pinyin}</span></div>
+              <div className={styles.flipHint}><span>✨ Click để lật xem nghĩa</span></div>
               
               <button 
                 className={styles.volumeBtnMain} 
@@ -212,16 +283,16 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
 
             {/* Back Side: Meaning & Example */}
             <div className={styles.flipCardBack}>
-              <div className={styles.vocabMeaningLarge}>{currentVocab.meaning}</div>
+              <div className={styles.vocabMeaningLarge}><span>{currentVocab.meaning}</span></div>
               {currentVocab.example && (
                 <div className={`${styles.vocabExampleBox} sketch-cross`}>
-                  <div className={styles.exPinyin}>{currentVocab.examplePinyin}</div>
-                  <div className={styles.exHanzi}>{currentVocab.example}</div>
-                  <div className={styles.exMeaning}>→ {currentVocab.exampleMeaning}</div>
+                  <div className={styles.exPinyin}><span>{currentVocab.examplePinyin}</span></div>
+                  <div className={styles.exHanzi}><span>{currentVocab.example}</span></div>
+                  <div className={styles.exMeaning}><span>→ {currentVocab.exampleMeaning}</span></div>
                   <button className={styles.exVolumeBtn} onClick={e => e.stopPropagation()}><Volume2 size={16} /></button>
                 </div>
               )}
-              <div className={styles.flipHint}>✨ Click để quay lại</div>
+              <div className={styles.flipHint}><span>✨ Click để quay lại</span></div>
             </div>
 
           </div>
@@ -256,7 +327,15 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
       )}
 
       {activeMode === 'quiz' && (
-        <QuizMode vocabs={vocabs} />
+        <div key="quiz">
+          <QuizMode vocabs={vocabs} />
+        </div>
+      )}
+      
+      {activeMode === 'typing' && (
+        <div key="typing">
+          <TypingMode vocabs={vocabs} />
+        </div>
       )}
 
       {/* Study Modes */}
@@ -321,12 +400,19 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
                   <div className={styles.vexHanzi}>{vocab.example}</div>
                   <div className={styles.vexMeaning}>→ {vocab.exampleMeaning}</div>
                 </div>
-                <button className={styles.vexVolume}><Volume2 size={14} /></button>
+                <button className={styles.vexVolume} onClick={(e) => handleSpeak(vocab.example, e)}><Volume2 size={14} /></button>
               </div>
             )}
           </div>
         ))}
       </div>
+
+      {/* Modals */}
+      <AutoPlayModal 
+        isOpen={isAutoPlayModalOpen} 
+        onClose={() => setIsAutoPlayModalOpen(false)} 
+        onStart={startAutoPlay} 
+      />
     </div>
   );
 };

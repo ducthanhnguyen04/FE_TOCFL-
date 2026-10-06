@@ -1,0 +1,260 @@
+.typingContainer {
+  background-color: var(--bg-paper);
+  border: 2.5px solid var(--border-sketch);
+  border-radius: var(--sketch-radius);
+  box-shadow: 4px 4px 0px var(--border-sketch);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  min-height: 480px;
+  animation: fadeIn 0.3s ease forwards;
+  background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');
+}
+
+.header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 24px 32px;
+}
+
+.modeToggles {
+  display: flex;
+  background-color: var(--bg-paper);
+  border: 1.5px solid var(--border-sketch);
+  padding: 4px;
+  gap: 4px;
+  border-radius: 6px;
+}
+
+.modeBtn {
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 4px;
+  color: var(--text-primary);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modeActive {
+  background-color: var(--border-sketch);
+  color: var(--bg-paper);
+}
+
+.settingsBtn {
+  padding: 8px;
+  border: 1.5px solid var(--border-sketch);
+  background: var(--bg-paper);
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 8px;
+  border-radius: 6px;
+}
+
+.mainArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 32px 40px;
+  text-align: center;
+  flex: 1;
+}
+
+.displayWord {
+  font-size: 56px;
+  font-weight: 900;
+  color: var(--text-primary);
+  font-family: 'Kaiti', 'STKaiti', serif;
+  margin-bottom: 8px;
+  letter-spacing: 2px;
+}
+
+.displayMeaning {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 40px;
+}
+
+.charSlots {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  min-height: 24px;
+}
+
+.slot {
+  width: 24px;
+  height: 2px;
+  background-color: var(--text-primary);
+}
+
+.inputWrapper {
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 16px;
+}
+
+.typeInput {
+  width: 100%;
+  padding: 16px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  background-color: rgba(255, 255, 255, 0.7);
+  border: 2px solid var(--border-sketch);
+  border-radius: 6px;
+  text-align: center;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.typeInput:focus {
+  background-color: #fff;
+  box-shadow: 2px 2px 0px var(--border-sketch);
+}
+
+.typeInput.correct {
+  background-color: #eef7ee;
+  border-color: #558a4d;
+  color: #558a4d;
+}
+
+.typeInput.wrong {
+  background-color: #fcebeb;
+  border-color: var(--card-red-top);
+  color: var(--card-red-top);
+  animation: shake 0.4s ease;
+}
+
+.actionsRow {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  max-width: 600px;
+}
+
+.actionBtn {
+  flex: 1;
+  padding: 14px 20px;
+  border-radius: 6px;
+  font-weight: 800;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.btnHint {
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 2px solid var(--border-sketch);
+  color: var(--text-primary);
+}
+
+.btnHint:hover {
+  background-color: #fff;
+}
+
+.btnCheck {
+  background-color: var(--text-primary);
+  border: 2px solid var(--text-primary);
+  color: var(--bg-paper);
+}
+
+.btnCheck:hover {
+  background-color: #333;
+}
+
+.btnNext {
+  background-color: #558a4d;
+  border: 2px solid #558a4d;
+  color: #fff;
+}
+
+.btnNext:hover {
+  background-color: #4a7a43;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 32px 24px;
+}
+
+.progressCounter {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-secondary);
+}
+
+.progressBarWrapper {
+  height: 6px;
+  width: 100%;
+  background-color: var(--grid-line);
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.progressBarFill {
+  height: 100%;
+  background-color: #558a4d;
+  transition: width 0.3s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+}
+
+/* Result screen reused styles */
+.resultScreen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 32px;
+  text-align: center;
+  flex: 1;
+  animation: fadeIn 0.4s ease forwards;
+}
+
+.resultMascot {
+  font-size: 80px;
+  margin-bottom: 20px;
+  line-height: 1;
+}
+
+.resultTitle {
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.resultSubtitle {
+  font-size: 15px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin-bottom: 40px;
+}
+
+.resultActionsRow {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  max-width: 500px;
+}
