@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './page.module.css';
+import { createClient } from '@/lib/supabase/client';
 import {
   Header,
   Sidebar,
@@ -26,7 +27,33 @@ export default function ClientPage({ courseId, lessonId }: { courseId?: string; 
   const router = useRouter();
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
   const [activeMenuId, setActiveMenuId] = useState('home');
-  const derivedSelectedLevel = courseId ? TOCFL_LEVELS.find(x => x.id === Number(courseId)) : null;
+  const [books, setBooks] = useState<any[]>([]);
+  
+  useEffect(() => {
+    const fetchBooks = async () => {
+      const supabase = createClient();
+      const { data } = await supabase.from('books').select('*').order('bookName', { ascending: true });
+      if (data) setBooks(data);
+    };
+    fetchBooks();
+  }, []);
+
+  const dynamicLevels = books.map((book, i) => {
+    const baseLevel = TOCFL_LEVELS[i] || {
+      level: i + 1,
+      wordCount: 0,
+      patternCount: 0,
+      description: 'Chưa có mô tả'
+    };
+    
+    return {
+      ...baseLevel,
+      id: book.id,
+      title: book.bookName
+    };
+  });
+
+  const derivedSelectedLevel = courseId ? dynamicLevels.find(x => x.id.toString() === courseId) : null;
   const [streakCount, setStreakCount] = useState(0);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -134,7 +161,7 @@ export default function ClientPage({ courseId, lessonId }: { courseId?: string; 
                 />
 
                 {/* TOCFL 3.0 Section with Cards */}
-                <TOCFLSection onCardClick={handleCardClick} />
+                <TOCFLSection levels={dynamicLevels} onCardClick={handleCardClick} />
               </>
             )}
 

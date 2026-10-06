@@ -3,7 +3,8 @@ import { ChevronRight, Lock } from 'lucide-react';
 import styles from './CourseDetail.module.css';
 
 interface LessonItem {
-  id: number;
+  id: string | number;
+  displayId?: number;
   title: string;
   vocabCount: number;
   isLocked: boolean;
@@ -11,7 +12,7 @@ interface LessonItem {
 
 interface GrammarListProps {
   lessons: LessonItem[];
-  onSelect?: (id: number) => void;
+  onSelect?: (id: string | number) => void;
 }
 
 export const GrammarList: React.FC<GrammarListProps> = ({ lessons, onSelect }) => {
@@ -23,7 +24,7 @@ export const GrammarList: React.FC<GrammarListProps> = ({ lessons, onSelect }) =
           className={`${styles.lessonCard} sketch-cross ${lesson.isLocked ? styles.lessonLocked : ''}`}
           onClick={() => !lesson.isLocked && onSelect?.(lesson.id)}
         >
-          <div className={`${styles.lessonNumber} sketch-cross`}>{lesson.id}</div>
+          <div className={`${styles.lessonNumber} sketch-cross`}>{lesson.displayId || lesson.id}</div>
           <div className={styles.lessonInfo}>
             <h4 className={styles.lessonTitle}>{lesson.title}</h4>
             <p className={styles.lessonDesc}>{lesson.vocabCount} mẫu ngữ pháp</p>

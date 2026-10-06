@@ -1,5 +1,5 @@
 export interface TOCFLLevelItem {
-  id: number;
+  id: string | number;
   title: string;
   level: number;
   wordCount: number;

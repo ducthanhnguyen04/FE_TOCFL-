@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './CourseDetail.module.css';
 import { ChevronLeft, ChevronRight, Lock } from 'lucide-react';
 import { TOCFLLevelItem } from '@/types';
@@ -6,26 +6,46 @@ import { VocabList } from './VocabList';
 import { GrammarList } from './GrammarList';
 import { HanziList } from './HanziList';
 import { useRouter, useParams } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 
 interface CourseDetailProps {
   item: TOCFLLevelItem;
   onBack: () => void;
 }
 
-const mockLessons = [
-  { id: 1, title: 'Xin chào!', vocabCount: 13, isLocked: false },
-  { id: 2, title: 'Tôi tên là NhaiTOCFL', vocabCount: 15, isLocked: true },
-  { id: 3, title: 'Tôi là người Việt Nam', vocabCount: 22, isLocked: true },
-  { id: 4, title: 'Tôi có hai đứa con', vocabCount: 21, isLocked: true },
-  { id: 5, title: 'Hôm nay tôi nghỉ', vocabCount: 22, isLocked: true },
-];
-
 export const CourseDetail: React.FC<CourseDetailProps> = ({ item, onBack }) => {
   const [activeTab, setActiveTab] = useState<'vocab' | 'grammar' | 'hanzi'>('vocab');
   const router = useRouter();
   const params = useParams();
+  const [dbLessons, setDbLessons] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchLessons = async () => {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from('lessons')
+        .select('*')
+        .eq('bookId', item.id)
+        .order('createdAt', { ascending: true });
+      
+      if (data) {
+        const mappedLessons = data.map((d, index) => ({
+          id: d.id,
+          displayId: index + 1,
+          title: d.lessonName,
+          vocabCount: 0, // Dữ liệu giả cho vocabCount tạm thời
+          isLocked: false // Mở khóa tất cả bài học
+        }));
+        setDbLessons(mappedLessons);
+      }
+    };
+    
+    if (item.id) {
+      fetchLessons();
+    }
+  }, [item.id]);
   
-  const handleLessonSelect = (lessonId: number) => {
+  const handleLessonSelect = (lessonId: string | number) => {
     router.push(`/course/${params.id}/lesson/${lessonId}`);
   };
 
@@ -101,7 +121,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ item, onBack }) => {
           <div className={`${styles.progressSection} sketch-cross`}>
             <div className={styles.progressHeader}>
               <span className={styles.progressTitle}>Tiến độ học</span>
-              <span className={styles.progressText}>0/15 bài</span>
+              <span className={styles.progressText}>0/{dbLessons.length} bài</span>
             </div>
             <div className={`${styles.progressBarTrack} sketch-cross`}>
               <div className={styles.progressBarFill} style={{ width: '0%' }}></div>
@@ -113,14 +133,14 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ item, onBack }) => {
           <div className={styles.lessonsSection}>
             <h3 className={styles.sectionLabel}>BÀI HỌC</h3>
             <div className={styles.lessonsList}>
-              {activeTab === 'vocab' && <VocabList lessons={mockLessons} onSelect={handleLessonSelect} />}
-              {activeTab === 'grammar' && <GrammarList lessons={mockLessons} onSelect={handleLessonSelect} />}
+              {activeTab === 'vocab' && <VocabList lessons={dbLessons} onSelect={handleLessonSelect} />}
+              {activeTab === 'grammar' && <GrammarList lessons={dbLessons} onSelect={handleLessonSelect} />}
             </div>
           </div>
         </>
       ) : (
         <div className={styles.lessonsSection}>
-          <HanziList lessons={mockLessons} onSelect={handleLessonSelect} />
+          <HanziList lessons={dbLessons} />
         </div>
       )}
     </div>

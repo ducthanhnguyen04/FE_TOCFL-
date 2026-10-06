@@ -7,14 +7,15 @@ import { TOCFL_LEVELS } from '@/data/tocflData';
 import { TOCFLLevelItem } from '@/types';
 
 interface TOCFLSectionProps {
+  levels: TOCFLLevelItem[];
   onCardClick?: (item: TOCFLLevelItem) => void;
 }
 
-export const TOCFLSection: React.FC<TOCFLSectionProps> = ({ onCardClick }) => {
+export const TOCFLSection: React.FC<TOCFLSectionProps> = ({ levels, onCardClick }) => {
   // Main cards are TOCFL 1 to 6
-  const primaryLevels = TOCFL_LEVELS.slice(0, 6);
+  const primaryLevels = levels.slice(0, 6);
   // Peek card is TOCFL 7-9 (as shown partially at bottom of screenshot)
-  const advancedLevels = TOCFL_LEVELS.slice(6);
+  const advancedLevels = levels.slice(6);
 
   return (
     <section className={styles.section} id="tocfl-section">

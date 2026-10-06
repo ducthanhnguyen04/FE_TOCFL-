@@ -4,7 +4,8 @@ import styles from './HanziList.module.css';
 import { PracticeSheetModal } from '../Modal/PracticeSheetModal';
 
 interface LessonItem {
-  id: number;
+  id: string | number;
+  displayId?: number;
   title: string;
   vocabCount: number;
   isLocked: boolean;

@@ -9,53 +9,7 @@ interface LessonDetailProps {
   onBack: () => void;
 }
 
-const mockVocabs = [
-  {
-    id: 1,
-    hanzi: '你好',
-    pinyin: 'nǐ hǎo',
-    sino: 'NỄ HẢO',
-    meaning: 'Xin chào',
-    tag: 'Cụm từ',
-    example: '李明，你好',
-    examplePinyin: 'lǐ míng, nǐ hǎo',
-    exampleMeaning: 'Chào Lý Minh'
-  },
-  {
-    id: 2,
-    hanzi: '王老师',
-    pinyin: 'Wáng lǎoshī',
-    sino: 'VƯƠNG LÃO SƯ',
-    meaning: 'Cô Vương',
-    tag: 'Danh từ',
-    example: '王老师，您好',
-    examplePinyin: 'wáng lǎoshī, nín hǎo',
-    exampleMeaning: 'Xin chào cô Vương'
-  },
-  {
-    id: 3,
-    hanzi: '大家',
-    pinyin: 'dàjiā',
-    sino: 'ĐẠI GIA',
-    meaning: 'Mọi người',
-    tag: 'Đại từ',
-    example: '大家好，我是新学生',
-    examplePinyin: 'dàjiā hǎo, wǒ shì xīn xuéshēng',
-    exampleMeaning: 'Chào mọi người, tôi là học sinh mới'
-  },
-  {
-    id: 4,
-    hanzi: '好',
-    pinyin: 'hǎo',
-    sino: 'HẢO',
-    meaning: 'Tốt, khỏe',
-    tag: 'Tính từ',
-    example: '老师，您好',
-    examplePinyin: 'lǎoshī, nín hǎo',
-    exampleMeaning: 'Xin chào thầy'
-  }
-];
-
+import { createClient } from '@/lib/supabase/client';
 const studyModes = [
   { id: 'flashcard', title: 'Flashcard', status: 'Chưa học' },
   { id: 'quiz', title: 'Trắc nghiệm', status: 'Chưa học' },
@@ -72,11 +26,49 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [slideDirection, setSlideDirection] = useState<'left' | 'right' | null>(null);
   const [isFlipped, setIsFlipped] = useState(false);
+  const [vocabs, setVocabs] = useState<any[]>([]);
+  const [lessonName, setLessonName] = useState('Đang tải...');
 
-  const currentVocab = mockVocabs[currentIndex];
+  React.useEffect(() => {
+    const fetchData = async () => {
+      const supabase = createClient();
+      
+      const { data: lessonData } = await supabase
+        .from('lessons')
+        .select('*')
+        .eq('id', lessonId)
+        .single();
+        
+      if (lessonData) setLessonName(lessonData.lessonName);
+      
+      const { data: vocabData } = await supabase
+        .from('vocabularies')
+        .select('*')
+        .eq('lessonId', lessonId)
+        .order('createdAt', { ascending: true });
+        
+      if (vocabData) {
+        const mappedVocabs = vocabData.map((v) => ({
+          id: v.id,
+          hanzi: v.vocabulary,
+          pinyin: v.pinyin,
+          meaning: v.vietnameseMeaning,
+          tag: 'Từ vựng', // Fallback tag since we don't have tags in db
+          example: null,
+          examplePinyin: null,
+          exampleMeaning: null
+        }));
+        setVocabs(mappedVocabs);
+        setCurrentIndex(0);
+      }
+    };
+    fetchData();
+  }, [lessonId]);
+
+  const currentVocab = vocabs[currentIndex] || {};
 
   const handleNext = () => {
-    if (currentIndex < mockVocabs.length - 1) {
+    if (currentIndex < vocabs.length - 1) {
       setSlideDirection('left');
       setIsFlipped(false);
       setCurrentIndex(prev => prev + 1);
@@ -89,6 +81,32 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
       setIsFlipped(false);
       setCurrentIndex(prev => prev - 1);
     }
+  };
+
+  const handleSpeak = (text: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    if (!text || typeof window === 'undefined') return;
+    
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    
+    // Lấy danh sách giọng đọc của hệ điều hành
+    const voices = window.speechSynthesis.getVoices();
+    
+    // Tìm giọng xịn nhất có thể (các giọng "Online" hoặc Premium của Windows/Mac)
+    let bestVoice = voices.find(v => v.name.includes('HsiaoChen') || v.name.includes('HsiaoYu') || v.name.includes('Mei-Jia')); 
+    if (!bestVoice) bestVoice = voices.find(v => v.lang === 'zh-TW'); // Fallback Đài Loan
+    if (!bestVoice) bestVoice = voices.find(v => v.name.includes('Xiaoxiao') || v.name.includes('Ting-Ting')); // Fallback Trung Quốc xịn
+    if (!bestVoice) bestVoice = voices.find(v => v.lang.includes('zh')); // Fallback bất kỳ giọng tiếng Trung nào
+    
+    if (bestVoice) {
+      utterance.voice = bestVoice;
+    } else {
+      utterance.lang = 'zh-TW';
+    }
+    
+    utterance.rate = 0.85; // Đọc chậm lại một chút xíu cho chuẩn
+    window.speechSynthesis.speak(utterance);
   };
 
   return (
@@ -108,8 +126,8 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
       {/* Header */}
       <div className={styles.header}>
         <div className={styles.lessonMeta}>
-          <span className={`${styles.lessonBadge} sketch-box`}>Bài {lessonId}</span>
-          <span className={styles.vocabCount}>13 từ vựng</span>
+          <span className={`${styles.lessonBadge} sketch-box`}>{lessonName}</span>
+          <span className={styles.vocabCount}>{vocabs.length} từ vựng</span>
         </div>
         <div className={styles.titleRow}>
           <div className={styles.mascot}>
@@ -120,9 +138,9 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
               <circle cx="24" cy="18" r="2" fill="#fff" />
             </svg>
           </div>
-          <h1 className={styles.mainTitle}>Xin chào!</h1>
+          <h1 className={styles.mainTitle}>{lessonName}</h1>
         </div>
-        <p className={styles.subtitle}>Bài {lessonId} — Từ vựng HSK</p>
+        <p className={styles.subtitle}>{lessonName} — Từ vựng HSK</p>
       </div>
 
       {/* Main Container based on active mode */}
@@ -146,7 +164,7 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
           </div>
           
           <div className={`${styles.fcCounter} sketch-cross`}>
-            {currentIndex + 1} / {mockVocabs.length}
+            {vocabs.length > 0 ? currentIndex + 1 : 0} / {vocabs.length}
           </div>
 
           <div className={styles.fcControls}>
@@ -168,7 +186,7 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
             {/* Front Side: Hanzi, Pinyin, Sino */}
             <div className={styles.flipCardFront}>
               <div className={styles.hanziDisplay}>
-                {currentVocab.hanzi.split('').map((char, idx) => (
+                {currentVocab.hanzi && currentVocab.hanzi.split('').map((char: string, idx: number) => (
                   <div key={idx} className={`${styles.hanziChar} sketch-box`}>
                     <div className={styles.hanziGridLines}>
                       <div className={styles.hline}></div>
@@ -184,7 +202,12 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
               <div className={styles.vocabPinyin}>{currentVocab.pinyin}</div>
               <div className={styles.flipHint}>✨ Click để lật xem nghĩa</div>
               
-              <button className={styles.volumeBtnMain} onClick={e => e.stopPropagation()}><Volume2 size={24} /></button>
+              <button 
+                className={styles.volumeBtnMain} 
+                onClick={(e) => handleSpeak(currentVocab.hanzi, e)}
+              >
+                <Volume2 size={24} />
+              </button>
             </div>
 
             {/* Back Side: Meaning & Example */}
@@ -224,7 +247,7 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
           <button 
             className={`${styles.navBtn} sketch-cross`}
             onClick={handleNext}
-            style={{ opacity: currentIndex === mockVocabs.length - 1 ? 0.5 : 1, pointerEvents: currentIndex === mockVocabs.length - 1 ? 'none' : 'auto' }}
+            style={{ opacity: currentIndex === vocabs.length - 1 ? 0.5 : 1, pointerEvents: currentIndex === vocabs.length - 1 ? 'none' : 'auto' }}
           >
             Sau <ChevronRight size={16} />
           </button>
@@ -233,7 +256,7 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
       )}
 
       {activeMode === 'quiz' && (
-        <QuizMode vocabs={mockVocabs} />
+        <QuizMode vocabs={vocabs} />
       )}
 
       {/* Study Modes */}
@@ -270,9 +293,8 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
         </div>
       </div>
 
-      {/* Vocab Grid List */}
       <div className={styles.vocabGrid}>
-        {mockVocabs.map((vocab, idx) => (
+        {vocabs.map((vocab, idx) => (
           <div key={vocab.id} className={`${styles.vocabCard} sketch-cross`}>
             <div className={styles.vcardTop}>
               <div className={styles.vcardLeft}>
@@ -289,7 +311,7 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
               <div className={styles.vcardTools}>
                 <button><Flag size={16} /></button>
                 <button><Star size={16} /></button>
-                <button><Volume2 size={16} /></button>
+                <button onClick={() => handleSpeak(vocab.hanzi)}><Volume2 size={16} /></button>
               </div>
             </div>
             {vocab.example && (
