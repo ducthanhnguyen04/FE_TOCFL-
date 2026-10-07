@@ -98,10 +98,12 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
       // Sử dụng API Google Dịch (GTX) để đọc chuẩn ngữ điệu và biến điệu (Tone Sandhi)
       const url = `https://translate.googleapis.com/translate_tts?client=gtx&ie=UTF-8&tl=zh-TW&q=${encodeURIComponent(text)}`;
       
-      if (!audioRef.current) {
-        audioRef.current = new Audio();
-      }
       const audio = audioRef.current;
+      if (!audio) {
+        resolve();
+        return;
+      }
+      
       audio.src = url;
       audio.load();
       
@@ -137,12 +139,10 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
     autoPlayRef.current = true;
     
     // Unlock Audio cho iOS (phải play() đồng bộ với click)
-    if (!audioRef.current) {
-      audioRef.current = new Audio();
+    if (audioRef.current) {
+      audioRef.current.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA'; 
+      audioRef.current.play().catch(() => {});
     }
-    // Play âm thanh im lặng 1 milisecond để iOS cấp quyền
-    audioRef.current.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA'; 
-    audioRef.current.play().catch(() => {});
     
     let currentIdx = currentIndex;
     
@@ -199,6 +199,7 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
 
   return (
     <div className={styles.lessonWrapper} style={{ animation: 'fadeIn 0.3s ease' }}>
+      <audio ref={audioRef} style={{ display: 'none' }} playsInline preload="auto" />
       {/* Top Bar */}
       <div className={styles.topBar}>
         <button onClick={onBack} className={styles.backBtn}>
