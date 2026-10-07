@@ -30,6 +30,7 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
   const [isAutoPlayModalOpen, setIsAutoPlayModalOpen] = useState(false);
   const [isAutoPlaying, setIsAutoPlaying] = useState(false);
   const autoPlayRef = React.useRef<boolean>(false);
+  const audioRef = React.useRef<HTMLAudioElement | null>(null);
   const [lessonName, setLessonName] = useState('Đang tải...');
 
   React.useEffect(() => {
@@ -96,7 +97,13 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
       
       // Sử dụng API Google Dịch (GTX) để đọc chuẩn ngữ điệu và biến điệu (Tone Sandhi)
       const url = `https://translate.googleapis.com/translate_tts?client=gtx&ie=UTF-8&tl=zh-TW&q=${encodeURIComponent(text)}`;
-      const audio = new Audio(url);
+      
+      if (!audioRef.current) {
+        audioRef.current = new Audio();
+      }
+      const audio = audioRef.current;
+      audio.src = url;
+      audio.load();
       
       audio.onended = () => resolve();
       audio.onerror = () => resolve();
@@ -128,6 +135,14 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
     setIsAutoPlayModalOpen(false);
     setIsAutoPlaying(true);
     autoPlayRef.current = true;
+    
+    // Unlock Audio cho iOS (phải play() đồng bộ với click)
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+    }
+    // Play âm thanh im lặng 1 milisecond để iOS cấp quyền
+    audioRef.current.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA'; 
+    audioRef.current.play().catch(() => {});
     
     let currentIdx = currentIndex;
     
