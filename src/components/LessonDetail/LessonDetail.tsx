@@ -95,8 +95,8 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
         return;
       }
       
-      // Sử dụng API Google Dịch (GTX) để đọc chuẩn ngữ điệu và biến điệu (Tone Sandhi)
-      const url = `https://translate.googleapis.com/translate_tts?client=gtx&ie=UTF-8&tl=zh-TW&q=${encodeURIComponent(text)}`;
+      // Sử dụng API backend của chúng ta để gọi Google Dịch (tránh lỗi chặn trên điện thoại)
+      const url = `/api/tts?text=${encodeURIComponent(text)}`;
       
       const audio = audioRef.current;
       if (!audio) {
