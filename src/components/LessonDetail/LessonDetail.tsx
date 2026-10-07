@@ -94,8 +94,8 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
       return Promise.resolve();
     }
     
-    // Sử dụng Google TTS chính thức (client=tw-ob) để hỗ trợ cả từ vựng lẫn các câu ví dụ dài
-    const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=zh-TW&client=tw-ob&q=${encodeURIComponent(text)}`;
+    // Gọi qua API Proxy nội bộ để bypass hoàn toàn lỗi CORS và Apple Webkit chặn audio
+    const url = `/api/tts?text=${encodeURIComponent(text)}`;
     
     let audio = audioRef.current;
     if (!audio) {
