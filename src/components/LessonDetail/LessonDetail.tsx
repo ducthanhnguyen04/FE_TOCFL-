@@ -207,10 +207,6 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
           <ChevronLeft size={16} />
           <span>Danh sách bài</span>
         </button>
-        <button className={`${styles.pinyinBtn} sketch-cross`}>
-          <Eye size={16} />
-          <span>Pinyin</span>
-        </button>
       </div>
 
       {/* Header */}
@@ -281,7 +277,7 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
                       <div className={styles.vline}></div>
                     </div>
                     <span>{char}</span>
-                    <button className={styles.expandIcon} onClick={e => e.stopPropagation()}><Eye size={12} /></button>
+
                   </div>
                 ))}
               </div>
