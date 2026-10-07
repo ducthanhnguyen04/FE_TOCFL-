@@ -94,8 +94,8 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
       return Promise.resolve();
     }
     
-    // Chuyển sang API Từ điển Youdao (chuẩn giọng và tự động biến điệu cực tốt)
-    const url = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(text)}&le=zh`;
+    // Sử dụng Google TTS chính thức (client=tw-ob) để hỗ trợ cả từ vựng lẫn các câu ví dụ dài
+    const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=zh-TW&client=tw-ob&q=${encodeURIComponent(text)}`;
     
     let audio = audioRef.current;
     if (!audio) {
@@ -115,7 +115,7 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
       const playPromise = audio.play();
       if (playPromise !== undefined) {
         playPromise.catch((err) => {
-          console.warn("Lỗi phát Audio (có thể do iOS), dùng giọng máy tính thay thế:", err);
+          console.warn("Lỗi phát Audio, dùng giọng máy tính thay thế:", err);
           window.speechSynthesis.cancel();
           const utterance = new SpeechSynthesisUtterance(text);
           utterance.lang = 'zh-TW';
