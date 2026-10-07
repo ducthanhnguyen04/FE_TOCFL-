@@ -4,7 +4,6 @@ import styles from './LessonDetail.module.css';
 import { QuizMode } from './QuizMode';
 import { TypingMode } from './TypingMode';
 import { AutoPlayModal, AutoPlaySettings } from '../Modal/AutoPlayModal';
-import { getTtsUrl } from '@/utils/tts';
 
 interface LessonDetailProps {
   courseId: string;
@@ -90,45 +89,48 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
 
   const handleSpeak = (text: string, e?: React.MouseEvent): Promise<void> => {
     if (e) e.stopPropagation();
+    
+    if (!text || typeof window === 'undefined') {
+      return Promise.resolve();
+    }
+    
+    // Chuyển sang API Từ điển Youdao (chuẩn giọng và tự động biến điệu cực tốt)
+    const url = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(text)}&le=zh`;
+    
+    let audio = audioRef.current;
+    if (!audio) {
+      audio = new Audio();
+      audioRef.current = audio;
+    }
+    
+    audio.src = url;
+    audio.load();
+    
     return new Promise((resolve) => {
-      if (!text || typeof window === 'undefined') {
-        resolve();
-        return;
-      }
+      if (!audio) return resolve();
       
-      // Sử dụng giọng đọc chuẩn (lấy trực tiếp từ kho mp3 static)
-      const primaryUrl = getTtsUrl(text);
-      const fallbackUrl = `/api/tts?text=${encodeURIComponent(text)}`;
+      audio.onended = () => resolve();
+      audio.onerror = () => resolve();
       
-      const audio = audioRef.current;
-      if (!audio) {
-        resolve();
-        return;
-      }
-      
-      audio.src = primaryUrl;
-      
-      const handleFallback = () => {
-        // Nếu file MP3 static không tồn tại (404), dùng API fallback
-        audio.removeEventListener('error', handleFallback);
-        audio.src = fallbackUrl;
-        audio.play().catch((err) => {
-          console.warn("Lỗi TTS fallback:", err);
-          resolve();
-        });
-      };
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((err) => {
+          console.warn("Lỗi phát Audio (có thể do iOS), dùng giọng máy tính thay thế:", err);
+          window.speechSynthesis.cancel();
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.lang = 'zh-TW';
+          utterance.rate = 0.85;
+          
+          const voices = window.speechSynthesis.getVoices();
+          let bestVoice = voices.find(v => v.name.includes('HsiaoChen') || v.name.includes('HsiaoYu') || v.name.includes('Mei-Jia') || v.name.includes('Ting-Ting')); 
+          if (!bestVoice) bestVoice = voices.find(v => v.lang === 'zh-TW');
+          if (bestVoice) utterance.voice = bestVoice;
 
-      audio.addEventListener('error', handleFallback);
-      
-      audio.onended = () => {
-        audio.removeEventListener('error', handleFallback);
-        resolve();
-      };
-      
-      audio.play().catch((err) => {
-         // Lỗi block trên iOS, thử dùng fallback
-         handleFallback();
-      });
+          utterance.onend = () => resolve();
+          utterance.onerror = () => resolve();
+          window.speechSynthesis.speak(utterance);
+        });
+      }
     });
   };
 
