@@ -4,6 +4,7 @@ import styles from './LessonDetail.module.css';
 import { QuizMode } from './QuizMode';
 import { TypingMode } from './TypingMode';
 import { AutoPlayModal, AutoPlaySettings } from '../Modal/AutoPlayModal';
+import { getTtsUrl } from '@/utils/tts';
 
 interface LessonDetailProps {
   courseId: string;
@@ -95,8 +96,9 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
         return;
       }
       
-      // Sử dụng API backend của chúng ta để gọi Google Dịch (tránh lỗi chặn trên điện thoại)
-      const url = `/api/tts?text=${encodeURIComponent(text)}`;
+      // Sử dụng giọng đọc chuẩn (lấy trực tiếp từ kho mp3 static)
+      const primaryUrl = getTtsUrl(text);
+      const fallbackUrl = `/api/tts?text=${encodeURIComponent(text)}`;
       
       const audio = audioRef.current;
       if (!audio) {
@@ -104,31 +106,28 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
         return;
       }
       
-      audio.src = url;
-      audio.load();
+      audio.src = primaryUrl;
       
-      audio.onended = () => resolve();
-      audio.onerror = () => resolve();
+      const handleFallback = () => {
+        // Nếu file MP3 static không tồn tại (404), dùng API fallback
+        audio.removeEventListener('error', handleFallback);
+        audio.src = fallbackUrl;
+        audio.play().catch((err) => {
+          console.warn("Lỗi TTS fallback:", err);
+          resolve();
+        });
+      };
+
+      audio.addEventListener('error', handleFallback);
+      
+      audio.onended = () => {
+        audio.removeEventListener('error', handleFallback);
+        resolve();
+      };
       
       audio.play().catch((err) => {
-        console.warn("Lỗi Google TTS, tự động dùng giọng máy tính thay thế:", err);
-        // Fallback nếu mạng lỗi
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
-        const voices = window.speechSynthesis.getVoices();
-        
-        let bestVoice = voices.find(v => v.name.includes('HsiaoChen') || v.name.includes('HsiaoYu') || v.name.includes('Mei-Jia')); 
-        if (!bestVoice) bestVoice = voices.find(v => v.lang === 'zh-TW'); 
-        if (!bestVoice) bestVoice = voices.find(v => v.name.includes('Xiaoxiao') || v.name.includes('Ting-Ting')); 
-        if (!bestVoice) bestVoice = voices.find(v => v.lang.includes('zh')); 
-        
-        if (bestVoice) utterance.voice = bestVoice;
-        else utterance.lang = 'zh-TW';
-        
-        utterance.rate = 0.85; 
-        utterance.onend = () => resolve();
-        utterance.onerror = () => resolve();
-        window.speechSynthesis.speak(utterance);
+         // Lỗi block trên iOS, thử dùng fallback
+         handleFallback();
       });
     });
   };
