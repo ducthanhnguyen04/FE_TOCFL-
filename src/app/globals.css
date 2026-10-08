@@ -219,3 +219,19 @@ a {
   color: var(--text-primary);
 }
 
+
+@media print {
+  html, body {
+    overflow: visible !important;
+    height: auto !important;
+  }
+  body > *:not(.print-modal-root) {
+    display: none !important;
+  }
+  .printableArea {
+    position: static !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}

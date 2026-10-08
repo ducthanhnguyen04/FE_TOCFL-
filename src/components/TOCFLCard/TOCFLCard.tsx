@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import styles from './TOCFLCard.module.css';
 import { TOCFLLevelItem } from '@/types';
+import { useLanguage } from '@/providers/LanguageProvider';
 
 interface TOCFLCardProps {
   item: TOCFLLevelItem;
@@ -11,10 +12,11 @@ interface TOCFLCardProps {
 }
 
 export const TOCFLCard: React.FC<TOCFLCardProps> = ({ item, onClick }) => {
+  const { t } = useLanguage();
   // Format info text like screenshot: "333 từ vựng • 41 mẫu" or "972 từ vựng"
   const statsLabel = item.patternCount
-    ? `${item.wordCount} từ vựng • ${item.patternCount} mẫu`
-    : `${item.wordCount} từ vựng`;
+    ? `${item.wordCount} ${t('course.vocabUnit')} • ${item.patternCount} ${t('course.patternUnit')}`
+    : `${item.wordCount} ${t('course.vocabUnit')}`;
 
   return (
     <Link href={`/course/${item.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>

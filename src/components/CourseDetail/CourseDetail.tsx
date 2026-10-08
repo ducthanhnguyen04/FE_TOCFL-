@@ -7,6 +7,7 @@ import { GrammarList } from './GrammarList';
 import { HanziList } from './HanziList';
 import { useRouter, useParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { useLanguage } from '@/providers/LanguageProvider';
 
 interface CourseDetailProps {
   item: TOCFLLevelItem;
@@ -17,6 +18,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ item, onBack }) => {
   const [activeTab, setActiveTab] = useState<'vocab' | 'grammar' | 'hanzi'>('vocab');
   const router = useRouter();
   const params = useParams();
+  const { t } = useLanguage();
   const [dbLessons, setDbLessons] = useState<any[]>([]);
 
   useEffect(() => {
@@ -53,7 +55,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ item, onBack }) => {
     <div className={styles.courseDetailWrapper} style={{ animation: 'fadeIn 0.3s ease' }}>
       <button onClick={onBack} className={styles.backBtn}>
         <ChevronLeft size={16} />
-        <span>Trang chủ</span>
+        <span>{t('course.home')}</span>
       </button>
 
       {/* Header Info */}
@@ -70,7 +72,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ item, onBack }) => {
         <div className={styles.infoBox}>
           <div className={styles.topBadges}>
             <span className={`${styles.levelBadge} sketch-cross`}>{item.title}</span>
-            <span className={styles.lessonCountBadge}>15 bài</span>
+            <span className={styles.lessonCountBadge}>15 {t('course.lessonCount')}</span>
           </div>
 
           <div className={styles.titleRow}>
@@ -91,25 +93,25 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ item, onBack }) => {
 
       {/* Skills Tabs */}
       <div className={styles.skillsSection}>
-        <h3 className={styles.sectionLabel}>KỸ NĂNG</h3>
+        <h3 className={styles.sectionLabel}>{t('course.skills')}</h3>
         <div className={styles.tabsRow}>
           <button 
             className={`${styles.tabBtn} ${activeTab === 'vocab' ? styles.tabBtnActive : ''} sketch-cross`}
             onClick={() => setActiveTab('vocab')}
           >
-            ✨ Từ vựng - 词汇
+            {t('course.vocabTab')}
           </button>
           <button 
             className={`${styles.tabBtn} ${activeTab === 'grammar' ? styles.tabBtnActive : ''} sketch-cross`}
             onClick={() => setActiveTab('grammar')}
           >
-            📄 Ngữ pháp - 语法
+            {t('course.grammarTab')}
           </button>
           <button 
             className={`${styles.tabBtn} ${activeTab === 'hanzi' ? styles.tabBtnActive : ''} sketch-cross`}
             onClick={() => setActiveTab('hanzi')}
           >
-            🖍 Chữ Hán - 汉字
+            {t('course.hanziTab')}
           </button>
         </div>
       </div>
@@ -120,8 +122,8 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ item, onBack }) => {
           {/* Progress */}
           <div className={`${styles.progressSection} sketch-cross`}>
             <div className={styles.progressHeader}>
-              <span className={styles.progressTitle}>Tiến độ học</span>
-              <span className={styles.progressText}>0/{dbLessons.length} bài</span>
+              <span className={styles.progressTitle}>{t('course.progressTitle')}</span>
+              <span className={styles.progressText}>0/{dbLessons.length} {t('course.lessonCount')}</span>
             </div>
             <div className={`${styles.progressBarTrack} sketch-cross`}>
               <div className={styles.progressBarFill} style={{ width: '0%' }}></div>
@@ -131,7 +133,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ item, onBack }) => {
 
           {/* Lessons List */}
           <div className={styles.lessonsSection}>
-            <h3 className={styles.sectionLabel}>BÀI HỌC</h3>
+            <h3 className={styles.sectionLabel}>{t('course.lessonsLabel')}</h3>
             <div className={styles.lessonsList}>
               {activeTab === 'vocab' && <VocabList lessons={dbLessons} onSelect={handleLessonSelect} />}
               {activeTab === 'grammar' && <GrammarList lessons={dbLessons} onSelect={handleLessonSelect} />}

@@ -5,6 +5,7 @@ import styles from './TOCFLSection.module.css';
 import { TOCFLCard } from '../TOCFLCard/TOCFLCard';
 import { TOCFL_LEVELS } from '@/data/tocflData';
 import { TOCFLLevelItem } from '@/types';
+import { useLanguage } from '@/providers/LanguageProvider';
 
 interface TOCFLSectionProps {
   levels: TOCFLLevelItem[];
@@ -12,6 +13,7 @@ interface TOCFLSectionProps {
 }
 
 export const TOCFLSection: React.FC<TOCFLSectionProps> = ({ levels, onCardClick }) => {
+  const { t } = useLanguage();
   // Main cards are TOCFL 1 to 6
   const primaryLevels = levels.slice(0, 6);
   // Peek card is TOCFL 7-9 (as shown partially at bottom of screenshot)
@@ -24,7 +26,7 @@ export const TOCFLSection: React.FC<TOCFLSectionProps> = ({ levels, onCardClick 
         <div className={styles.pencilIndicator} aria-hidden="true" />
         <div className={styles.titleArea}>
           <h2 className={styles.sectionTitle}>TOCFL 3.0</h2>
-          <span className={styles.sectionSubtitle}>Bản cải tiến</span>
+          <span className={styles.sectionSubtitle}>{t('home.improvedVersion')}</span>
         </div>
       </div>
 

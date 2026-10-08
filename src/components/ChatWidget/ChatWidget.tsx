@@ -1,23 +1,25 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MessageSquare, X, Send } from 'lucide-react';
+import { useLanguage } from '@/providers/LanguageProvider';
 import styles from './ChatWidget.module.css';
 
 export const ChatWidget: React.FC = () => {
+  const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Array<{ sender: 'bot' | 'user'; text: string }>>([
-    {
-      sender: 'bot',
-      text: 'Chào bạn! Mình là trợ lý Nhai TOCFL. Bạn đang muốn bắt đầu học cấp độ nào?',
-    },
-  ]);
+  const [messages, setMessages] = useState<Array<{ sender: 'bot' | 'user'; text: string }>>([]);
   const [inputValue, setInputValue] = useState('');
 
+  // Update greeting when language changes or on mount
+  useEffect(() => {
+    setMessages([{ sender: 'bot', text: t('chat.botGreeting') }]);
+  }, [t]);
+
   const quickTopics = [
-    'Lộ trình TOCFL 1',
-    'TOCFL 3.0 khác gì 2.0?',
-    'Mẹo nhớ chữ Hán',
+    t('chat.quick1'),
+    t('chat.quick2'),
+    t('chat.quick3'),
   ];
 
   const handleSendMessage = (textToSend?: string) => {
@@ -30,11 +32,11 @@ export const ChatWidget: React.FC = () => {
 
     // Quick bot answer
     setTimeout(() => {
-      let reply = 'Cảm ơn câu hỏi của bạn! Hãy nhấp vào một trong các thẻ TOCFL trên màn hình để bắt đầu học ngay nhé!';
-      if (text.includes('TOCFL 1') || text.includes('Lộ trình')) {
-        reply = 'TOCFL 1 bản mới gồm 333 từ vựng và 41 mẫu câu căn bản, bạn nên học phát âm pinyin chuẩn trước tiên nhé!';
+      let reply = t('chat.replyDefault');
+      if (text.includes('TOCFL 1') || text.includes('Lộ trình') || text.includes('Route') || text.includes('Rute')) {
+        reply = t('chat.replyRoute');
       } else if (text.includes('3.0')) {
-        reply = 'TOCFL 3.0 chia thành 3 giai đoạn và 9 cấp độ (thay vì 6 cấp như trước), bổ sung thêm nhiều từ vựng và kỹ năng giao tiếp thực tế hơn!';
+        reply = t('chat.replyTOCFL3');
       }
       setMessages((prev) => [...prev, { sender: 'bot', text: reply }]);
     }, 600);
@@ -47,13 +49,13 @@ export const ChatWidget: React.FC = () => {
         <div className={styles.chatWindow}>
           <div className={styles.chatHeader}>
             <div className={styles.chatHeaderTitle}>
-              <span>🤖 Trợ lý Nhai TOCFL</span>
+              <span>{t('chat.botTitle')}</span>
             </div>
             <button
               type="button"
               className={styles.closeChatBtn}
               onClick={() => setIsOpen(false)}
-              aria-label="Đóng khung chat"
+              aria-label={t('chat.closeAria')}
             >
               <X size={15} />
             </button>
@@ -62,10 +64,10 @@ export const ChatWidget: React.FC = () => {
           <div className={styles.messagesList}>
             {messages.map((msg, index) => (
               <div
-                key={index}
+                key={`${msg.sender}-${index}`}
                 className={msg.sender === 'bot' ? styles.botMsg : styles.userMsg}
               >
-                {msg.text}
+                <span>{msg.text}</span>
               </div>
             ))}
           </div>
@@ -74,12 +76,12 @@ export const ChatWidget: React.FC = () => {
           <div className={styles.quickChips}>
             {quickTopics.map((topic, i) => (
               <button
-                key={i}
+                key={`topic-${i}`}
                 type="button"
                 className={styles.chipBtn}
                 onClick={() => handleSendMessage(topic)}
               >
-                {topic}
+                <span>{topic}</span>
               </button>
             ))}
           </div>
@@ -95,11 +97,11 @@ export const ChatWidget: React.FC = () => {
             <input
               type="text"
               className={styles.chatInput}
-              placeholder="Nhập câu hỏi..."
+              placeholder={t('chat.inputPlaceholder')}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
             />
-            <button type="submit" className={styles.sendBtn} aria-label="Gửi tin nhắn">
+            <button type="submit" className={styles.sendBtn} aria-label={t('chat.sendAria')}>
               <Send size={13} />
             </button>
           </form>
@@ -111,10 +113,10 @@ export const ChatWidget: React.FC = () => {
         type="button"
         className={styles.chatTriggerBtn}
         onClick={() => setIsOpen(!isOpen)}
-        aria-label="Nhắn tin hỗ trợ"
+        aria-label={t('chat.triggerAria')}
       >
         <MessageSquare size={17} />
-        <span className={styles.btnText}>Nhắn tin</span>
+        <span className={styles.btnText}>{t('chat.message')}</span>
       </button>
     </div>
   );

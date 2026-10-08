@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useUser } from '@/providers/UserProvider';
+import { useLanguage } from '@/providers/LanguageProvider';
 import styles from './HeroSection.module.css';
 
 interface HeroSectionProps {
@@ -14,7 +15,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   onJoinCommunity,
 }) => {
   const { user } = useUser();
-  const displayName = user?.user_metadata?.full_name || 'bạn';
+  const { t } = useLanguage();
+  const displayName = user?.user_metadata?.full_name || t('hero.defaultName');
 
   return (
     <section className={styles.heroSection}>
@@ -52,7 +54,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         </div>
 
         <h1 className={styles.heading}>
-          <span>Chào</span>
+          <span>{t('hero.hello')}</span>
           <span className={styles.highlightWord}>{displayName}</span>
           <span className={styles.waveEmoji} role="img" aria-label="Waving hand">
             👏
@@ -63,27 +65,15 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
       {/* Intro Description */}
       <div className={styles.introText}>
         <p>
-          Tiếp tục hành trình từ vựng tiếng Đài Loan của bạn — mỗi ngày một chút là đủ.
+          {t('hero.intro')}
         </p>
-        <p>
-          Nhai TOCFL là website miễn phí giúp bạn tự học tiếng Đài Loan và luyện thi TOCFL 3.0 (cấp 1–9): giáo trình từ vựng – ngữ pháp, bảng pinyin, bộ thủ, từ điển, shadowing video và ôn tập ngắt quãng.{' '}
-          <a
-            href="#tocfl-intro"
-            className={styles.learnMoreLink}
-            onClick={(e) => {
-              e.preventDefault();
-              onLearnMore?.();
-            }}
-          >
-            Tìm hiểu thêm về Nhai TOCFL
-          </a>
-        </p>
+
       </div>
 
       {/* Community group invite */}
       <div className={styles.communityRow}>
         <span className={styles.communityLabel}>
-          Vào nhóm học cùng mọi người nhé:
+          {t('hero.joinCommunity')}
         </span>
         <button
           type="button"
@@ -91,7 +81,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           onClick={onJoinCommunity}
         >
           <span className={styles.pinIcon}>🎈</span>
-          <span>Nhai tiếng Đài Loan mỗi ngày</span>
+          <span>{t('hero.communityName')}</span>
         </button>
       </div>
     </section>

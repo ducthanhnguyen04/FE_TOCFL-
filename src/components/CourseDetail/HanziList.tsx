@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
-import { Layers, PenTool, FileText } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Layers, PenTool, FileText, Loader } from 'lucide-react';
 import styles from './HanziList.module.css';
 import { PracticeSheetModal } from '../Modal/PracticeSheetModal';
+import { useLanguage } from '@/providers/LanguageProvider';
+import { createClient } from '@/lib/supabase/client';
 
 interface LessonItem {
   id: string | number;
@@ -15,36 +17,81 @@ interface HanziListProps {
   lessons: LessonItem[];
 }
 
-// Sample characters matching the screenshot layout
-const charData = "你好王老师大家学生们您谢不客气同再见请问叫什么名字我是对起没关系事很高兴认识也人的中国法文这谁女朋友哪她泰喂姐工作还忙吗太想有多少个哥呢几口爸妈妹和儿子孩岁他今年天号月日星期休息会做饭面条饺一些菜下班新电脑真看喜欢它手机话明去超市买东西牛奶吃晚那边包非常米怎坐出租车安店现在点上午分课吧影院半里医钟后房间外只小猫桌漂亮病胡前椅本书第习白读唱歌听视狗玩杯售货员钱块水果斤便宜商衣";
-const characters = charData.split('');
-
-export const HanziList: React.FC<HanziListProps> = () => {
+export const HanziList: React.FC<HanziListProps> = ({ lessons }) => {
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
+  const [characters, setCharacters] = useState<string[]>([]);
+  const [vocabData, setVocabData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { t, lang } = useLanguage();
+
+  useEffect(() => {
+    const fetchHanzi = async () => {
+      if (!lessons || lessons.length === 0) {
+        setCharacters([]);
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      const lessonIds = lessons.map(l => l.id);
+      const supabase = createClient();
+      
+      const { data, error } = await supabase
+        .from('vocabularies')
+        .select('vocabulary, pinyin, vietnameseMeaning, englishMeaning, indonesiaMeaning')
+        .in('lessonId', lessonIds);
+        
+      if (data) {
+        setVocabData(data);
+        const uniqueChars = new Set<string>();
+        data.forEach(item => {
+          if (item.vocabulary) {
+            for (const char of item.vocabulary) {
+              if (char.match(/[\u4e00-\u9fa5]/)) {
+                uniqueChars.add(char);
+              }
+            }
+          }
+        });
+        setCharacters(Array.from(uniqueChars));
+      } else {
+        console.error('Error fetching hanzi:', error);
+      }
+      setLoading(false);
+    };
+
+    fetchHanzi();
+  }, [lessons]);
 
   return (
     <div className={styles.hanziWrapper}>
       {/* Header Row */}
       <div className={styles.headerRow}>
         <div className={styles.sectionTitle}>
-          {characters.length} chữ Hán mới trong cuốn này
+          {loading ? (
+            <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Loader size={16} className={styles.spinner} /> {t('lesson.loading')}
+            </span>
+          ) : (
+            <span>{characters.length} {t('course.newHanzi')}</span>
+          )}
         </div>
         
         <div className={styles.actionsGroup}>
           <button className={`${styles.actionBtn} ${styles.flashcardBtn} sketch-cross`}>
             <Layers size={14} />
-            <span>Flashcard</span>
+            <span>{t('course.flashcard')}</span>
           </button>
           <button className={`${styles.actionBtn} sketch-cross`}>
             <PenTool size={14} />
-            <span>Luyện viết</span>
+            <span>{t('course.practice')}</span>
           </button>
           <button 
             className={`${styles.actionBtn} sketch-cross`}
             onClick={() => setIsPrintModalOpen(true)}
           >
             <FileText size={14} />
-            <span>Tạo file</span>
+            <span>{t('course.createFile')}</span>
           </button>
         </div>
       </div>
@@ -52,8 +99,8 @@ export const HanziList: React.FC<HanziListProps> = () => {
       {/* Grid Container */}
       <div className={`${styles.gridContainer} sketch-cross`}>
         <div className={styles.grid}>
-          {characters.map((char, index) => (
-            <div key={index} className={styles.charBox}>
+          {characters.map((char) => (
+            <div key={char} className={styles.charBox}>
               {char}
             </div>
           ))}
@@ -63,6 +110,13 @@ export const HanziList: React.FC<HanziListProps> = () => {
       <PracticeSheetModal 
         isOpen={isPrintModalOpen} 
         onClose={() => setIsPrintModalOpen(false)} 
+        items={vocabData.map(v => ({
+          char: v.vocabulary,
+          pinyin: v.pinyin,
+          meaning: lang === 'en' && v.englishMeaning ? v.englishMeaning : 
+                   lang === 'id' && v.indonesiaMeaning ? v.indonesiaMeaning : 
+                   v.vietnameseMeaning
+        }))}
       />
     </div>
   );

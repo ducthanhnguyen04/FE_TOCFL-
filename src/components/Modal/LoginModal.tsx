@@ -1,5 +1,6 @@
 import React from 'react';
 import { X, Mail, Lock } from 'lucide-react';
+import { useLanguage } from '@/providers/LanguageProvider';
 import styles from './LoginModal.module.css';
 
 interface LoginModalProps {
@@ -8,6 +9,7 @@ interface LoginModalProps {
 }
 
 export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
+  const { t } = useLanguage();
   if (!isOpen) return null;
 
   return (
@@ -19,10 +21,10 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
         {/* Header */}
         <div className={styles.header}>
           <div className={styles.titleArea}>
-            <h2 className={styles.title}>Đăng nhập</h2>
-            <p className={styles.subtitle}>Đăng nhập để đồng bộ tiến trình học của bạn.</p>
+            <h2 className={styles.title}>{t('login.title')}</h2>
+            <p className={styles.subtitle}>{t('login.subtitle')}</p>
           </div>
-          <button className={`${styles.closeBtn} sketch-cross`} onClick={onClose} title="Đóng">
+          <button className={`${styles.closeBtn} sketch-cross`} onClick={onClose} title={t('login.close')}>
             <X size={20} />
           </button>
         </div>
@@ -76,13 +78,13 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             }}
           >
             <span style={{ color: '#4285F4', fontWeight: 'bold', fontSize: '15px' }}>G</span>
-            <span>Đăng nhập bằng Google</span>
+            <span>{t('login.google')}</span>
           </button>
         </div>
 
         {/* Divider */}
         <div className={styles.divider}>
-          <span>HOẶC</span>
+          <span>{t('login.or')}</span>
         </div>
 
         {/* Email & Password Form */}
@@ -93,17 +95,17 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
           </div>
           <div className={`${styles.inputWrapper} sketch-cross`}>
             <Lock size={16} className={styles.inputIcon} />
-            <input type="password" placeholder="Mật khẩu" className={styles.input} />
+            <input type="password" placeholder={t('login.password')} className={styles.input} />
           </div>
           
           <button type="submit" className={`${styles.submitBtn} sketch-cross`}>
-            Đăng nhập
+            {t('login.submit')}
           </button>
         </form>
 
         {/* Footer Terms */}
         <div className={styles.footerTerms}>
-          Bằng việc đăng nhập, bạn đồng ý với Điều khoản sử dụng và Chính sách quyền riêng tư.
+          {t('login.terms')}
         </div>
       </div>
     </div>

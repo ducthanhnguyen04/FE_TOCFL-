@@ -1,5 +1,6 @@
 import React from 'react';
 import { ChevronRight, Lock } from 'lucide-react';
+import { useLanguage } from '@/providers/LanguageProvider';
 import styles from './CourseDetail.module.css';
 
 interface LessonItem {
@@ -16,9 +17,15 @@ interface GrammarListProps {
 }
 
 export const GrammarList: React.FC<GrammarListProps> = ({ lessons, onSelect }) => {
+  const { t } = useLanguage();
   return (
     <div className={styles.lessonsList}>
-      {lessons.map((lesson) => (
+      {lessons.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: '32px 16px', color: '#666', fontStyle: 'italic' }}>
+          {t('course.emptyLesson')}
+        </div>
+      ) : (
+        lessons.map((lesson) => (
         <button
           key={lesson.id}
           className={`${styles.lessonCard} sketch-cross ${lesson.isLocked ? styles.lessonLocked : ''}`}
@@ -27,7 +34,7 @@ export const GrammarList: React.FC<GrammarListProps> = ({ lessons, onSelect }) =
           <div className={`${styles.lessonNumber} sketch-cross`}>{lesson.displayId || lesson.id}</div>
           <div className={styles.lessonInfo}>
             <h4 className={styles.lessonTitle}>{lesson.title}</h4>
-            <p className={styles.lessonDesc}>{lesson.vocabCount} mẫu ngữ pháp</p>
+            <p className={styles.lessonDesc}>{lesson.vocabCount} {t('course.grammarUnit')}</p>
           </div>
           <div className={styles.lessonAction}>
             {lesson.isLocked ? (
@@ -37,7 +44,7 @@ export const GrammarList: React.FC<GrammarListProps> = ({ lessons, onSelect }) =
             )}
           </div>
         </button>
-      ))}
+      )))}
     </div>
   );
 };

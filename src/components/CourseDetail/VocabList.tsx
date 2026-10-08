@@ -1,5 +1,6 @@
 import React from 'react';
 import { ChevronRight, Lock } from 'lucide-react';
+import { useLanguage } from '@/providers/LanguageProvider';
 import styles from './CourseDetail.module.css';
 
 interface LessonItem {
@@ -16,11 +17,12 @@ interface VocabListProps {
 }
 
 export const VocabList: React.FC<VocabListProps> = ({ lessons, onSelect }) => {
+  const { t } = useLanguage();
   return (
     <div className={styles.lessonsList}>
       {lessons.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '32px 16px', color: '#666', fontStyle: 'italic' }}>
-          Chưa có bài học nào
+          {t('course.emptyLesson')}
         </div>
       ) : (
         lessons.map((lesson) => (
@@ -32,7 +34,7 @@ export const VocabList: React.FC<VocabListProps> = ({ lessons, onSelect }) => {
             <div className={`${styles.lessonNumber} sketch-cross`}>{lesson.displayId || lesson.id}</div>
             <div className={styles.lessonInfo}>
               <h4 className={styles.lessonTitle}>{lesson.title}</h4>
-              <p className={styles.lessonDesc}>{lesson.vocabCount} từ vựng</p>
+              <p className={styles.lessonDesc}>{lesson.vocabCount} {t('course.vocabUnit')}</p>
             </div>
             <div className={styles.lessonAction}>
               {lesson.isLocked ? (

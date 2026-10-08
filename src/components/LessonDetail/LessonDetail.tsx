@@ -18,11 +18,11 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
   const { lang, t } = useLanguage();
   
   const studyModes = [
-    { id: 'flashcard', title: t('lesson.vocab'), status: 'Chưa học' },
-    { id: 'quiz', title: 'Trắc nghiệm', status: 'Chưa học' },
-    { id: 'typing', title: 'Gõ từ', status: 'Chưa học' },
-    { id: 'reading', title: 'Đọc hiểu', status: 'Chưa học' },
-    { id: 'listening', title: 'Nghe ghép câu', status: 'Chưa học' },
+    { id: 'flashcard', title: t('lesson.vocab'), status: t('lesson.unstudied') },
+    { id: 'quiz', title: t('lesson.quiz'), status: t('lesson.unstudied') },
+    { id: 'typing', title: t('lesson.typing'), status: t('lesson.unstudied') },
+    { id: 'reading', title: t('lesson.reading'), status: t('lesson.unstudied') },
+    { id: 'listening', title: t('lesson.listening'), status: t('lesson.unstudied') },
   ];
 
   const [activeTab, setActiveTab] = useState<'vocab' | 'example'>('vocab');
@@ -35,7 +35,7 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
   const [isAutoPlaying, setIsAutoPlaying] = useState(false);
   const autoPlayRef = React.useRef<boolean>(false);
   const audioRef = React.useRef<HTMLAudioElement | null>(null);
-  const [lessonName, setLessonName] = useState('Đang tải...');
+  const [lessonName, setLessonName] = useState(t('lesson.loading'));
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -243,7 +243,7 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
       <div className={styles.topBar}>
         <button onClick={onBack} className={styles.backBtn}>
           <ChevronLeft size={16} />
-          <span>Danh sách bài</span>
+          <span>{t('lesson.list')}</span>
         </button>
       </div>
 
@@ -251,7 +251,7 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
       <div className={styles.header}>
         <div className={styles.lessonMeta}>
           <span className={`${styles.lessonBadge} sketch-box`}>{lessonName}</span>
-          <span className={styles.vocabCount}>{vocabs.length} từ vựng</span>
+          <span className={styles.vocabCount}>{vocabs.length} {t('lesson.vocabUnit')}</span>
         </div>
         <div className={styles.titleRow}>
           <div className={styles.mascot}>
@@ -264,7 +264,7 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
           </div>
           <h1 className={styles.mainTitle}>{lessonName}</h1>
         </div>
-        <p className={styles.subtitle}>{lessonName} — Từ vựng HSK</p>
+        <p className={styles.subtitle}>{lessonName} — {t('lesson.hskVocab')}</p>
       </div>
 
       {/* Main Container based on active mode */}
@@ -356,14 +356,14 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
             onClick={handlePrev}
             style={{ opacity: currentIndex === 0 ? 0.5 : 1, pointerEvents: currentIndex === 0 ? 'none' : 'auto' }}
           >
-            <ChevronLeft size={16} /> Trước
+            <ChevronLeft size={16} /> {t('lesson.prev')}
           </button>
           <div className={styles.actionBtns}>
             <button className={`${styles.actionBtn} ${styles.btnRed} sketch-cross`}>
-              <X size={16} /> Chưa thuộc
+              <X size={16} /> {t('lesson.notMemorized')}
             </button>
             <button className={`${styles.actionBtn} ${styles.btnGreen} sketch-cross`}>
-              <Check size={16} /> Đã thuộc
+              <Check size={16} /> {t('lesson.memorized')}
             </button>
           </div>
           <button 
@@ -371,7 +371,7 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
             onClick={handleNext}
             style={{ opacity: currentIndex === vocabs.length - 1 ? 0.5 : 1, pointerEvents: currentIndex === vocabs.length - 1 ? 'none' : 'auto' }}
           >
-            Sau <ChevronRight size={16} />
+            {t('lesson.next')} <ChevronRight size={16} />
           </button>
         </div>
       </div>
@@ -391,7 +391,7 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
 
       {/* Study Modes */}
       <div className={styles.studyModesSection}>
-        <h3 className={styles.sectionTitle}>Chọn chế độ học</h3>
+        <h3 className={styles.sectionTitle}>{t('lesson.chooseMode')}</h3>
         <div className={styles.modesScroll}>
           {studyModes.map(mode => (
             <button 

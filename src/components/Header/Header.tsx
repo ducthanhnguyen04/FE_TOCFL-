@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { Zap, LogIn, LogOut, Bell, Settings, FileText } from 'lucide-react';
 import { useUser } from '@/providers/UserProvider';
+import { useLanguage } from '@/providers/LanguageProvider';
 import styles from './Header.module.css';
 
 interface HeaderProps {
@@ -19,6 +20,7 @@ export const Header: React.FC<HeaderProps> = ({
   onAccountSettingsClick,
 }) => {
   const { user, logout } = useUser();
+  const { t } = useLanguage();
   const [showDropdown, setShowDropdown] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -74,7 +76,7 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Right: Streak & Login Button */}
       <div className={styles.rightSection}>
-        <div className={styles.streakBadge} title="Chuỗi ngày học liên tục">
+        <div className={styles.streakBadge} title={t('header.streakTitle')}>
           <Zap className={styles.lightningIcon} />
           <span>{streakCount}</span>
         </div>
@@ -92,11 +94,11 @@ export const Header: React.FC<HeaderProps> = ({
               {showNotifications && (
                 <div className={`${styles.notifDropdown} sketch-box`}>
                   <div className={styles.notifHeader}>
-                    Thông báo
+                    {t('header.notifTitle')}
                   </div>
                   <div className={styles.notifBody}>
                     <Bell size={32} strokeWidth={1.5} className={styles.emptyBellIcon} />
-                    <span className={styles.emptyText}>Chưa có thông báo</span>
+                    <span className={styles.emptyText}>{t('header.noNotif')}</span>
                   </div>
                 </div>
               )}
@@ -124,7 +126,7 @@ export const Header: React.FC<HeaderProps> = ({
               {showDropdown && (
                 <div className={`${styles.dropdownMenu} sketch-box`}>
                   <div className={styles.dropdownHeader}>
-                    <span className={styles.dropdownName}>{user.user_metadata?.full_name || 'Người dùng'}</span>
+                    <span className={styles.dropdownName}>{user.user_metadata?.full_name || t('header.defaultUser')}</span>
                     <span className={styles.dropdownEmail}>{user.email}</span>
                   </div>
                   <div className={styles.dropdownBody}>
@@ -136,15 +138,15 @@ export const Header: React.FC<HeaderProps> = ({
                       }}
                     >
                       <Settings size={18} strokeWidth={2} />
-                      <span>Cài đặt tài khoản</span>
+                      <span>{t('header.accountSettings')}</span>
                     </button>
                     <button className={styles.dropdownItem}>
                       <FileText size={18} strokeWidth={2} />
-                      <span>Điều khoản & chính sách</span>
+                      <span>{t('header.terms')}</span>
                     </button>
                     <button className={styles.logoutBtn} onClick={handleLogout}>
                       <LogOut size={18} strokeWidth={2} />
-                      <span>Đăng xuất</span>
+                      <span>{t('header.logout')}</span>
                     </button>
                   </div>
                 </div>
@@ -158,7 +160,7 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={onLoginClick}
           >
             <LogIn className={styles.loginIcon} />
-            <span>Đăng nhập</span>
+            <span>{t('header.login')}</span>
           </button>
         )}
       </div>

@@ -17,7 +17,7 @@ const patrickHand = Patrick_Hand({
 });
 
 export const metadata: Metadata = {
-  title: 'Nhai TOCFL - Học tiếng Đài Loan & Luyện thi TOCFL 3.0',
+  title: 'Nhai TOCFL - Học tiếng Đài Loan & Luyện thi TOCFL',
   description: 'Website tự học tiếng Đài Loan và luyện thi TOCFL 3.0 miễn phí từ cấp 1 đến cấp 9 với giáo trình từ vựng, ngữ pháp, pinyin và shadowing.',
 };
 
