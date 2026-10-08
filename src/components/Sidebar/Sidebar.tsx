@@ -5,6 +5,7 @@ import styles from './Sidebar.module.css';
 import { MENU_ITEMS } from '@/data/menuData';
 import { MenuIcon } from './MenuIcon';
 import { MenuItem } from '@/types';
+import { useLanguage } from '@/providers/LanguageProvider';
 
 interface SidebarProps {
   activeId?: string;
@@ -15,6 +16,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   activeId = 'home',
   onSelectMenu,
 }) => {
+  const { t } = useLanguage();
   const [openSubmenuId, setOpenSubmenuId] = React.useState<string | null>(null);
   const sidebarRef = React.useRef<HTMLElement>(null);
 
@@ -63,7 +65,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <MenuIcon name={item.iconName} size={19} />
                 </div>
                 <div className={styles.labelWrapper}>
-                  <span className={styles.label}>{item.label}</span>
+                  <span className={styles.label}>{t(`menu.${item.id}`) || item.label}</span>
                   {item.hasSubmenu && (
                     <span className={styles.arrow}>{isSubmenuOpen ? 'v' : '>'}</span>
                   )}
@@ -86,7 +88,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           <span className={styles.subMenuBadge}>{sub.badge}</span>
                         )}
                         <MenuIcon name={sub.iconName} size={20} />
-                        <span className={styles.subMenuLabel}>{sub.label}</span>
+                        <span className={styles.subMenuLabel}>{t(`menu.${sub.id}`) || sub.label}</span>
                       </button>
                     ))}
                   </div>

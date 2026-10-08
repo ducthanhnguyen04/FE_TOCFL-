@@ -23,6 +23,7 @@ export const metadata: Metadata = {
 
 import { UserProvider } from '@/providers/UserProvider';
 import { ThemeProvider } from '@/providers/ThemeProvider';
+import { LanguageProvider } from '@/providers/LanguageProvider';
 import { createClient } from '@/lib/supabase/server';
 
 export default async function RootLayout({
@@ -37,9 +38,11 @@ export default async function RootLayout({
     <html lang="vi" className={`${beVietnamPro.variable} ${patrickHand.variable}`} suppressHydrationWarning>
       <body className="paper-grid-bg" suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-          <UserProvider initialUser={user}>
-            <div id="app-root">{children}</div>
-          </UserProvider>
+          <LanguageProvider>
+            <UserProvider initialUser={user}>
+              <div id="app-root">{children}</div>
+            </UserProvider>
+          </LanguageProvider>
         </ThemeProvider>
       </body>
     </html>

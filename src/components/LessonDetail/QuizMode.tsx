@@ -3,7 +3,7 @@ import { Volume2, Settings, HeartCrack, Check, X, ChevronRight, RotateCcw, Zap }
 import styles from './QuizMode.module.css';
 
 interface Vocab {
-  id: number;
+  id: number | string;
   hanzi: string;
   pinyin: string;
   sino: string;

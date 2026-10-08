@@ -4,6 +4,7 @@ import styles from './LessonDetail.module.css';
 import { QuizMode } from './QuizMode';
 import { TypingMode } from './TypingMode';
 import { AutoPlayModal, AutoPlaySettings } from '../Modal/AutoPlayModal';
+import { useLanguage } from '@/providers/LanguageProvider';
 
 interface LessonDetailProps {
   courseId: string;
@@ -12,15 +13,18 @@ interface LessonDetailProps {
 }
 
 import { createClient } from '@/lib/supabase/client';
-const studyModes = [
-  { id: 'flashcard', title: 'Flashcard', status: 'Chưa học' },
-  { id: 'quiz', title: 'Trắc nghiệm', status: 'Chưa học' },
-  { id: 'typing', title: 'Gõ từ', status: 'Chưa học' },
-  { id: 'reading', title: 'Đọc hiểu', status: 'Chưa học' },
-  { id: 'listening', title: 'Nghe ghép câu', status: 'Chưa học' },
-];
 
 export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, onBack }) => {
+  const { lang, t } = useLanguage();
+  
+  const studyModes = [
+    { id: 'flashcard', title: t('lesson.vocab'), status: 'Chưa học' },
+    { id: 'quiz', title: 'Trắc nghiệm', status: 'Chưa học' },
+    { id: 'typing', title: 'Gõ từ', status: 'Chưa học' },
+    { id: 'reading', title: 'Đọc hiểu', status: 'Chưa học' },
+    { id: 'listening', title: 'Nghe ghép câu', status: 'Chưa học' },
+  ];
+
   const [activeTab, setActiveTab] = useState<'vocab' | 'example'>('vocab');
   const [activeMode, setActiveMode] = useState('flashcard');
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -45,23 +49,44 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
         
       if (lessonData) setLessonName(lessonData.lessonName);
       
-      const { data: vocabData } = await supabase
+      const { data: vocabData, error } = await supabase
         .from('vocabularies')
-        .select('*')
+        .select(`
+          *,
+          examples (
+            example,
+            pinyin,
+            vietnammeaning,
+            englishmeaning,
+            indonesiameaning
+          )
+        `)
         .eq('lessonId', lessonId)
         .order('createdAt', { ascending: true });
         
+      if (error) {
+        console.error("Supabase fetch error:", error);
+      }
+      
       if (vocabData) {
-        const mappedVocabs = vocabData.map((v) => ({
-          id: v.id,
-          hanzi: v.vocabulary,
-          pinyin: v.pinyin,
-          meaning: v.vietnameseMeaning,
-          tag: 'Từ vựng', // Fallback tag since we don't have tags in db
-          example: null,
-          examplePinyin: null,
-          exampleMeaning: null
-        }));
+        const mappedVocabs = vocabData.map((v) => {
+          const ex = Array.isArray(v.examples) ? v.examples[0] : v.examples;
+          
+          return {
+            id: v.id,
+            hanzi: v.vocabulary,
+            pinyin: v.pinyin,
+            vietnameseMeaning: v.vietnameseMeaning,
+            englishMeaning: v.englishMeaning,
+            indonesiaMeaning: v.indonesiaMeaning, // Giả sử bảng vocabularies cũng có cột này
+            tag: 'Từ vựng', // Fallback tag since we don't have tags in db
+            example: ex?.example || null,
+            examplePinyin: ex?.pinyin || null,
+            exampleVietnamMeaning: ex?.vietnammeaning || null,
+            exampleEnglishMeaning: ex?.englishmeaning || null,
+            exampleIndonesiaMeaning: ex?.indonesiameaning || null
+          };
+        });
         setVocabs(mappedVocabs);
         setCurrentIndex(0);
       }
@@ -70,6 +95,19 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
   }, [lessonId]);
 
   const currentVocab = vocabs[currentIndex] || {};
+  
+  // Hàm trợ giúp lấy nghĩa theo ngôn ngữ đang chọn
+  const getMeaning = (vocabItem: any) => {
+    if (lang === 'en' && vocabItem.englishMeaning) return vocabItem.englishMeaning;
+    if (lang === 'id' && vocabItem.indonesiaMeaning) return vocabItem.indonesiaMeaning;
+    return vocabItem.vietnameseMeaning || vocabItem.meaning;
+  };
+  
+  const getExampleMeaning = (vocabItem: any) => {
+    if (lang === 'en' && vocabItem.exampleEnglishMeaning) return vocabItem.exampleEnglishMeaning;
+    if (lang === 'id' && vocabItem.exampleIndonesiaMeaning) return vocabItem.exampleIndonesiaMeaning;
+    return vocabItem.exampleVietnamMeaning;
+  };
 
   const handleNext = () => {
     if (currentIndex < vocabs.length - 1) {
@@ -239,7 +277,7 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
               className={`${styles.fcTabBtn} ${activeTab === 'vocab' ? styles.fcTabActive : ''} sketch-cross`}
               onClick={() => setActiveTab('vocab')}
             >
-              📚 Từ vựng
+              📚 {t('lesson.vocab')}
             </button>
           </div>
           
@@ -248,13 +286,13 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
           </div>
 
           <div className={styles.fcControls}>
-            <button className={`${styles.fcControlBtn} sketch-cross`}><RefreshCw size={14} /> ZH → VI</button>
+            <button className={`${styles.fcControlBtn} sketch-cross`}><RefreshCw size={14} /> ZH → {lang.toUpperCase()}</button>
             <button 
               className={`${styles.fcControlBtn} sketch-cross`}
               onClick={() => isAutoPlaying ? stopAutoPlay() : setIsAutoPlayModalOpen(true)}
             >
               <Play size={14} fill={isAutoPlaying ? "#d82924" : "none"} stroke={isAutoPlaying ? "#d82924" : "currentColor"} /> 
-              {isAutoPlaying ? 'Dừng phát' : 'Tự động'}
+              {isAutoPlaying ? t('lesson.stop') : t('lesson.auto')}
             </button>
           </div>
         </div>
@@ -284,7 +322,7 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
 
               <div className={styles.vocabTag}><span>{currentVocab.tag}</span></div>
               <div className={styles.vocabPinyin}><span>{currentVocab.pinyin}</span></div>
-              <div className={styles.flipHint}><span>✨ Click để lật xem nghĩa</span></div>
+              <div className={styles.flipHint}><span>{t('lesson.hint')}</span></div>
               
               <button 
                 className={styles.volumeBtnMain} 
@@ -296,13 +334,13 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
 
             {/* Back Side: Meaning & Example */}
             <div className={styles.flipCardBack}>
-              <div className={styles.vocabMeaningLarge}><span>{currentVocab.meaning}</span></div>
+              <div className={styles.vocabMeaningLarge}><span>{getMeaning(currentVocab)}</span></div>
               {currentVocab.example && (
                 <div className={`${styles.vocabExampleBox} sketch-cross`}>
                   <div className={styles.exPinyin}><span>{currentVocab.examplePinyin}</span></div>
                   <div className={styles.exHanzi}><span>{currentVocab.example}</span></div>
-                  <div className={styles.exMeaning}><span>→ {currentVocab.exampleMeaning}</span></div>
-                  <button className={styles.exVolumeBtn} onClick={e => e.stopPropagation()}><Volume2 size={16} /></button>
+                  <div className={styles.exMeaning}><span>→ {getExampleMeaning(currentVocab)}</span></div>
+                  <button className={styles.exVolumeBtn} onClick={e => { e.stopPropagation(); handleSpeak(currentVocab.example, e); }}><Volume2 size={16} /></button>
                 </div>
               )}
               <div className={styles.flipHint}><span>✨ Click để quay lại</span></div>
@@ -380,8 +418,8 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
       {/* List Header */}
       <div className={styles.listHeader}>
         <div className={styles.listActions}>
-          <button className={`${styles.listActionBtn} sketch-cross`}><Printer size={14} /> In file</button>
-          <button className={`${styles.listActionBtn} ${styles.btnYellow} sketch-cross`}><Star size={14} /> Thêm cả bài vào ôn tập</button>
+          <button className={`${styles.listActionBtn} sketch-cross`}><Printer size={14} /> {t('lesson.print')}</button>
+          <button className={`${styles.listActionBtn} ${styles.btnYellow} sketch-cross`}><Star size={14} /> {t('lesson.addReview')}</button>
         </div>
       </div>
 
@@ -398,7 +436,7 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
               </div>
               <div className={styles.vcardRight}>
                 <div className={styles.vcardPinyin}>{vocab.pinyin}</div>
-                <div className={styles.vcardMeaning}>{vocab.meaning}</div>
+                <div className={styles.vcardMeaning}>{getMeaning(vocab)}</div>
               </div>
               <div className={styles.vcardTools}>
                 <button><Flag size={16} /></button>
@@ -411,7 +449,7 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
                 <div className={styles.vexampleBlock}>
                   <div className={styles.vexPinyin}>{vocab.examplePinyin}</div>
                   <div className={styles.vexHanzi}>{vocab.example}</div>
-                  <div className={styles.vexMeaning}>→ {vocab.exampleMeaning}</div>
+                  <div className={styles.vexMeaning}>→ {getExampleMeaning(vocab)}</div>
                 </div>
                 <button className={styles.vexVolume} onClick={(e) => handleSpeak(vocab.example, e)}><Volume2 size={14} /></button>
               </div>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { X, Palette, Sun, Moon, Languages, Check } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { useLanguage } from '@/providers/LanguageProvider';
 import styles from './SettingsModal.module.css';
 
 interface SettingsModalProps {
@@ -9,18 +10,14 @@ interface SettingsModalProps {
 }
 
 const languages = [
-  'Tiếng Việt',
-  'English',
-  '日本語',
-  '한국어',
-  'Bahasa Indonesia',
-  'ภาษาไทย',
-  'Русский'
+  { id: 'vi', label: 'Tiếng Việt' },
+  { id: 'en', label: 'English' },
+  { id: 'id', label: 'Bahasa Indonesia' }
 ];
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
   const { theme, setTheme } = useTheme();
-  const [lang, setLang] = useState('Tiếng Việt');
+  const { lang, setLang, t } = useLanguage();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -52,14 +49,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
 
         <div className={styles.header}>
           <Palette size={22} strokeWidth={2.5} />
-          <h2>Cài đặt</h2>
+          <h2>{t('settings.title')}</h2>
         </div>
         <p className={styles.subtitle}>
-          Chế độ hiển thị, ngôn ngữ giao diện, giọng đọc và trợ lý AI.
+          {t('settings.subtitle')}
         </p>
 
         <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>Chế độ hiển thị</h3>
+          <h3 className={styles.sectionTitle}>{t('settings.theme')}</h3>
           {mounted && (
             <div className={styles.themeGrid}>
               <button 
@@ -67,7 +64,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                 onClick={() => setTheme('light')}
               >
                 <Sun size={24} strokeWidth={2} />
-                <span>Sáng</span>
+                <span>{t('settings.theme.light')}</span>
                 {theme === 'light' && <Check size={16} className={styles.checkIcon} />}
               </button>
               <button 
@@ -75,7 +72,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                 onClick={() => setTheme('dark')}
               >
                 <Moon size={24} strokeWidth={2} />
-                <span>Tối</span>
+                <span>{t('settings.theme.dark')}</span>
                 {theme === 'dark' && <Check size={16} className={styles.checkIcon} />}
               </button>
             </div>
@@ -85,17 +82,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
         <div className={styles.section}>
           <h3 className={styles.sectionTitle}>
             <Languages size={18} strokeWidth={2} className={styles.langIcon} />
-            Ngôn ngữ giao diện
+            {t('settings.language')}
           </h3>
           <div className={styles.langGrid}>
             {languages.map((l) => (
               <button
-                key={l}
-                className={`${styles.langCard} ${lang === l ? styles.activeLang : ''} sketch-box`}
-                onClick={() => setLang(l)}
+                key={l.id}
+                className={`${styles.langCard} ${lang === l.id ? styles.activeLang : ''} sketch-box`}
+                onClick={() => setLang(l.id as any)}
               >
-                <span>{l}</span>
-                {lang === l && <Check size={14} className={styles.checkIcon} />}
+                <span>{l.label}</span>
+                {lang === l.id && <Check size={14} className={styles.checkIcon} />}
               </button>
             ))}
           </div>
