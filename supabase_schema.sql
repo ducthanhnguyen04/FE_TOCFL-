@@ -1,4 +1,4 @@
--- Chạy đoạn mã SQL này trong phần SQL Editor của Supabase để tạo bảng User và tự động đồng bộ khi có người Login bằng Google
+﻿-- Chạy đoạn mã SQL này trong phần SQL Editor của Supabase để tạo bảng User và tự động đồng bộ khi có người Login bằng Google
 
 -- 1. Tạo bảng users
 CREATE TABLE public.users (
@@ -44,7 +44,7 @@ create trigger on_auth_user_created
   for each row execute procedure public.handle_new_user();
 
 
--- 5. LUU �: Ch?y do?n m� n�y d? �?NG B? C�C T�I KHO?N �� �ANG NH?P TRU?C �� (tru?c khi t?o b?ng/trigger)
+-- 5. LUU �: Ch?y do?n m� n�y d? �?NG B? C�C T�I KHO?N �� �ANG NH?P TRU?C �� (tru?c khi t?o b?ng/trigger)
 INSERT INTO public.users (id, email, username, avatarurl, googleid)
 SELECT 
   id,
@@ -54,3 +54,30 @@ SELECT
   raw_user_meta_data->>'provider_id'
 FROM auth.users
 ON CONFLICT (id) DO NOTHING;
+
+
+-- ==========================================
+-- TAO BANG HANDICRAFTS (BO THU)
+-- ==========================================
+CREATE TABLE public.handicrafts (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  pinyin TEXT,
+  stroke INTEGER,
+  vietnamMeaning TEXT,
+  englishMeaning TEXT,
+  indonesiaMeaning TEXT,
+  createdAt TIMESTAMPTZ DEFAULT NOW(),
+  updatedAt TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Bat RLS (Row Level Security)
+ALTER TABLE public.handicrafts ENABLE ROW LEVEL SECURITY;
+
+-- Cap quyen cho phep tat ca moi nguoi (hoac user da dang nhap) READ data hien thi ra frontend
+CREATE POLICY "Cho phep tat ca moi nguoi xem bo thu" 
+ON public.handicrafts 
+FOR SELECT 
+USING (true);
+
+
