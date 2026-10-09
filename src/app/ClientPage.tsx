@@ -18,17 +18,22 @@ import {
   SettingsView,
   CourseDetail,
   LessonDetail,
+  RadicalsList,
 } from '@/components';
 import { TOCFLLevelItem, MenuItem } from '@/types';
 import { TOCFL_LEVELS } from '@/data/tocflData';
 import { useRouter } from 'next/navigation';
 
-export default function ClientPage({ courseId, lessonId }: { courseId?: string; lessonId?: string }) {
+export default function ClientPage({ courseId, lessonId, initialActiveMenuId = 'home' }: { courseId?: string; lessonId?: string; initialActiveMenuId?: string }) {
   const router = useRouter();
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
-  const [activeMenuId, setActiveMenuId] = useState('home');
+  const [activeMenuId, setActiveMenuId] = useState(initialActiveMenuId);
   const [books, setBooks] = useState<any[]>([]);
   
+  useEffect(() => {
+
+  }, []);
+
   useEffect(() => {
     const fetchBooks = async () => {
       const supabase = createClient();
@@ -71,7 +76,20 @@ export default function ClientPage({ courseId, lessonId }: { courseId?: string; 
       setIsSettingsModalOpen(true);
       return;
     }
-    setActiveMenuId(item.id);
+    
+    // Explicit route mapping for main features
+    const routeMapping: Record<string, string> = {
+      'home': '/',
+      'radicals': '/radicals',
+      'account_settings': '/settings'
+    };
+
+    if (routeMapping[item.id]) {
+      router.push(routeMapping[item.id]);
+    } else {
+      // Show toast or alert for unimplemented features instead of 404
+      alert('Tính năng đang được phát triển!');
+    }
   };
 
   const handleLoginClick = () => {
@@ -152,6 +170,8 @@ export default function ClientPage({ courseId, lessonId }: { courseId?: string; 
               />
             ) : activeMenuId === 'account_settings' ? (
               <SettingsView />
+            ) : activeMenuId === 'radicals' ? (
+              <RadicalsList />
             ) : (
               <>
                 {/* Hero Greeting Section */}
@@ -191,3 +211,5 @@ export default function ClientPage({ courseId, lessonId }: { courseId?: string; 
     </div>
   );
 }
+
+// Trigger HMR

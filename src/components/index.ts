@@ -14,3 +14,4 @@ export { SettingsView } from './SettingsView/SettingsView';
 export { CourseDetail } from './CourseDetail/CourseDetail';
 export { LessonDetail } from './LessonDetail/LessonDetail';
 export { PracticeSheetModal } from './Modal/PracticeSheetModal';
+export * from './RadicalsList/RadicalsList';

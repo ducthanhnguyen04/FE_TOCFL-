@@ -38,10 +38,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
   }, [openSubmenuId]);
 
   const handleMenuClick = (item: MenuItem) => {
-    onSelectMenu?.(item);
-    if (item.subItems) {
+    if (item.subItems && item.subItems.length > 0) {
       setOpenSubmenuId((prev) => (prev === item.id ? null : item.id));
     } else {
+      onSelectMenu?.(item);
       setOpenSubmenuId(null);
     }
   };
@@ -72,17 +72,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </div>
               </button>
 
-              <div style={{ position: 'absolute', top: 0, right: 0, width: 0, height: 0 }}>
+              <>
                 {isSubmenuOpen && item.subItems && (
                   <div className={`${styles.submenuFloating} sketch-cross`}>
                     {item.subItems.map((sub) => (
                       <button
                         key={sub.id}
+                        type="button"
                         className={`${styles.subMenuItem} ${
                           activeId === sub.id ? styles.subMenuItemActive : ''
                         }`}
-                        onClick={() => onSelectMenu?.(sub as MenuItem)}
-                        style={{ position: 'relative' }}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          onSelectMenu?.(sub as MenuItem);
+                          setOpenSubmenuId(null);
+                        }}
+                        style={{ position: 'relative', zIndex: 9999, pointerEvents: 'auto', cursor: 'pointer' }}
                       >
                         {sub.badge && (
                           <span className={styles.subMenuBadge}>{sub.badge}</span>
@@ -93,7 +99,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     ))}
                   </div>
                 )}
-              </div>
+              </>
             </li>
           );
         })}
