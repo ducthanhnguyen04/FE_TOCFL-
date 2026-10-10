@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, Eye, RefreshCw, Play, Shuffle, Settings, Vol
 import styles from './LessonDetail.module.css';
 import { QuizMode } from './QuizMode';
 import { TypingMode } from './TypingMode';
+import { ReadingMode } from './ReadingMode';
 import { AutoPlayModal, AutoPlaySettings } from '../Modal/AutoPlayModal';
 import { useLanguage } from '@/providers/LanguageProvider';
 
@@ -386,6 +387,12 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
       {activeMode === 'typing' && (
         <div key="typing">
           <TypingMode vocabs={vocabs} />
+        </div>
+      )}
+
+      {activeMode === 'reading' && (
+        <div key="reading">
+          <ReadingMode lessonId={lessonId} vocabs={vocabs} />
         </div>
       )}
 

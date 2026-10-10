@@ -35,8 +35,8 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ item, onBack }) => {
           id: d.id,
           displayId: index + 1,
           title: d.lessonName,
-          vocabCount: 0, // Dữ liệu giả cho vocabCount tạm thời
-          isLocked: false // Mở khóa tất cả bài học
+          vocabCount: d.wordCount || 0,
+          isLocked: d.isLocked || false
         }));
         setDbLessons(mappedLessons);
       }
