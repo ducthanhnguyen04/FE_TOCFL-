@@ -55,44 +55,16 @@
 
 /* Cards Grid */
 .cardsGrid {
-  display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  gap: 18px;
-}
-
-@media (min-width: 680px) {
-  .cardsGrid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-  }
-}
-
-@media (min-width: 1080px) {
-  .cardsGrid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 22px;
-  }
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
 }
 
 /* Peek Row for Extra Levels (like TOCFL 7-9 preview) */
 .peekRow {
   margin-top: 22px;
-  display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  gap: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
   opacity: 0.85;
-}
-
-@media (min-width: 680px) {
-  .peekRow {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-  }
-}
-
-@media (min-width: 1080px) {
-  .peekRow {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 22px;
-  }
 }

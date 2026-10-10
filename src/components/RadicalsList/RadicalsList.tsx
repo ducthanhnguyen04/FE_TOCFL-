@@ -333,6 +333,8 @@ export const RadicalsList = () => {
                     if (idx !== -1) {
                       setCurrentIndex(idx);
                       setIsFlipped(false);
+                      // Play pronunciation audio
+                      handleSpeak(r.name);
                       // Scroll to top
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }
@@ -343,9 +345,6 @@ export const RadicalsList = () => {
                     <div className={styles.gridHeader}>
                       <span className={styles.gridName}>
                         {r.vietnammeaning?.split(',')[0]?.trim()}
-                      </span>
-                      <span className={styles.gridIndex}>
-                        #{filteredRadicals.findIndex(x => x.id === r.id) + 1}
                       </span>
                     </div>
                     <div className={styles.gridMeaning}>{getMeaning(r)}</div>

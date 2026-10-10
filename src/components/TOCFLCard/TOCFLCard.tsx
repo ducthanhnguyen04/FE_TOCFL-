@@ -26,14 +26,9 @@ export const TOCFLCard: React.FC<TOCFLCardProps> = ({ item, onClick }) => {
         tabIndex={0}
         aria-label={`${item.title} - ${statsLabel}`}
       >
-        {/* Upper Red Crayon / Chalk Banner */}
-        <div className={styles.topBanner}>
+        <div className={styles.bookInner}>
+          <span className={styles.bookBrand}>Nhai</span>
           <h2 className={styles.cardTitle}>{item.title}</h2>
-        </div>
-
-        {/* Lower Mustard Gold Stats Bar */}
-        <div className={styles.bottomStrip}>
-          <span className={styles.statsText}>{statsLabel}</span>
         </div>
       </article>
     </Link>

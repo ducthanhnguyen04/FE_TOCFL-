@@ -28,37 +28,42 @@ export default function ClientPage({ courseId, lessonId, initialActiveMenuId = '
   const router = useRouter();
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
   const [activeMenuId, setActiveMenuId] = useState(initialActiveMenuId);
-  const [books, setBooks] = useState<any[]>([]);
+  const [seriesList, setSeriesList] = useState<any[]>([]);
   
   useEffect(() => {
-
-  }, []);
-
-  useEffect(() => {
-    const fetchBooks = async () => {
+    const fetchSeries = async () => {
       const supabase = createClient();
-      const { data } = await supabase.from('books').select('*').order('bookName', { ascending: true });
-      if (data) setBooks(data);
+      const { data } = await supabase
+        .from('book_series')
+        .select('*, books(*)')
+        .order('orderindex', { ascending: true });
+      if (data) {
+        // Sắp xếp các cuốn sách trong mỗi bộ giáo trình theo bookName
+        const sortedData = data.map(series => {
+          if (series.books) {
+            series.books.sort((a: any, b: any) => a.bookName.localeCompare(b.bookName));
+          }
+          return series;
+        });
+        setSeriesList(sortedData);
+      }
     };
-    fetchBooks();
+    fetchSeries();
   }, []);
 
-  const dynamicLevels = books.map((book, i) => {
-    const baseLevel = TOCFL_LEVELS[i] || {
-      level: i + 1,
-      wordCount: 0,
-      patternCount: 0,
-      description: 'Chưa có mô tả'
-    };
-    
-    return {
-      ...baseLevel,
-      id: book.id,
-      title: book.bookName
-    };
-  });
-
-  const derivedSelectedLevel = courseId ? dynamicLevels.find(x => x.id.toString() === courseId) : null;
+  // Gộp tất cả các sách từ tất cả các bộ để tìm sách khi vào trang chi tiết CourseDetail
+  const allBooks = seriesList.flatMap(series => series.books || []);
+  const derivedSelectedLevel = courseId ? allBooks.find(x => x.id.toString() === courseId) : null;
+  
+  // Format book for CourseDetail
+  const formattedSelectedLevel = derivedSelectedLevel ? {
+    id: derivedSelectedLevel.id,
+    title: derivedSelectedLevel.bookName,
+    level: 1,
+    wordCount: 0,
+    patternCount: 0,
+    description: ''
+  } : null;
   const [streakCount, setStreakCount] = useState(0);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -163,9 +168,9 @@ export default function ClientPage({ courseId, lessonId, initialActiveMenuId = '
                 lessonId={lessonId} 
                 onBack={() => router.push(`/course/${courseId}`)}
               />
-            ) : derivedSelectedLevel ? (
+            ) : formattedSelectedLevel ? (
               <CourseDetail
-                item={derivedSelectedLevel}
+                item={formattedSelectedLevel}
                 onBack={() => router.push('/')}
               />
             ) : activeMenuId === 'account_settings' ? (
@@ -180,8 +185,22 @@ export default function ClientPage({ courseId, lessonId, initialActiveMenuId = '
                   onJoinCommunity={handleJoinCommunity}
                 />
 
-                {/* TOCFL 3.0 Section with Cards */}
-                <TOCFLSection levels={dynamicLevels} onCardClick={handleCardClick} />
+                {/* Series Sections with Cards */}
+                {seriesList.map(series => (
+                  <TOCFLSection 
+                    key={series.id}
+                    title={series.name}
+                    levels={(series.books || []).map((book: any, index: number) => ({
+                      id: book.id,
+                      title: book.bookName,
+                      level: index + 1,
+                      wordCount: 0,
+                      patternCount: 0,
+                      description: ''
+                    }))} 
+                    onCardClick={handleCardClick} 
+                  />
+                ))}
               </>
             )}
 
