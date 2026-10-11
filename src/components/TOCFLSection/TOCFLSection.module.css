@@ -57,14 +57,14 @@
 .cardsGrid {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 26px;
 }
 
 /* Peek Row for Extra Levels (like TOCFL 7-9 preview) */
 .peekRow {
-  margin-top: 22px;
+  margin-top: 26px;
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 26px;
   opacity: 0.85;
 }
