@@ -112,7 +112,7 @@
 
 .activeTheme {
   background-color: var(--btn-dark);
-  color: var(--btn-dark-hover);
+  color: #ffffff;
 }
 
 .langGrid {
@@ -139,7 +139,7 @@
 
 .activeLang {
   background-color: var(--btn-dark);
-  color: var(--btn-dark-hover);
+  color: #ffffff;
 }
 
 .checkIcon {
