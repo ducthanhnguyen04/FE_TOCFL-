@@ -23,9 +23,11 @@ import {
 import { TOCFLLevelItem, MenuItem } from '@/types';
 import { TOCFL_LEVELS } from '@/data/tocflData';
 import { useRouter } from 'next/navigation';
+import { useUser } from '@/providers/UserProvider';
 
 export default function ClientPage({ courseId, lessonId, initialActiveMenuId = 'home' }: { courseId?: string; lessonId?: string; initialActiveMenuId?: string }) {
   const router = useRouter();
+  const { openLoginModal } = useUser();
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
   const [activeMenuId, setActiveMenuId] = useState(initialActiveMenuId);
   const [seriesList, setSeriesList] = useState<any[]>([]);
@@ -98,7 +100,7 @@ export default function ClientPage({ courseId, lessonId, initialActiveMenuId = '
   };
 
   const handleLoginClick = () => {
-    setIsLoginModalOpen(true);
+    openLoginModal();
   };
 
   const handleJoinCommunity = () => {
@@ -213,14 +215,6 @@ export default function ClientPage({ courseId, lessonId, initialActiveMenuId = '
 
       {/* Floating Chat Widget */}
       <ChatWidget />
-
-
-
-      {/* Login Modal */}
-      <LoginModal
-        isOpen={isLoginModalOpen}
-        onClose={() => setIsLoginModalOpen(false)}
-      />
 
       {/* Settings Modal */}
       <SettingsModal

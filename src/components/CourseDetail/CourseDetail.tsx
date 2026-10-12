@@ -8,6 +8,7 @@ import { HanziList } from './HanziList';
 import { useRouter, useParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { useLanguage } from '@/providers/LanguageProvider';
+import { useUser } from '@/providers/UserProvider';
 
 interface CourseDetailProps {
   item: TOCFLLevelItem;
@@ -19,6 +20,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ item, onBack }) => {
   const router = useRouter();
   const params = useParams();
   const { t } = useLanguage();
+  const { user, openLoginModal } = useUser();
   const [dbLessons, setDbLessons] = useState<any[]>([]);
 
   useEffect(() => {
@@ -48,6 +50,10 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ item, onBack }) => {
   }, [item.id]);
   
   const handleLessonSelect = (lessonId: string | number) => {
+    if (!user) {
+      openLoginModal();
+      return;
+    }
     router.push(`/course/${params.id}/lesson/${lessonId}`);
   };
 

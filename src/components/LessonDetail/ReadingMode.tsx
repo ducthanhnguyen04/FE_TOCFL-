@@ -130,7 +130,7 @@ export const ReadingMode: React.FC<ReadingModeProps> = ({ lessonId, vocabs }) =>
     const wrongCount = currentQueue.length - correctCount;
 
     return (
-      <div className={`${styles.quizContainer} sketch-box`} style={{ alignItems: 'center', justifyContent: 'center', backgroundImage: 'url("/vietnam_watermark.svg")', backgroundSize: '60%', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', backgroundColor: '#F9F0DF' }}>
+      <div className={`${styles.quizContainer} sketch-box`} style={{ alignItems: 'center', justifyContent: 'center', backgroundImage: 'url("/vietnam_watermark.svg")', backgroundSize: '60%', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
         <div className={styles.resultScreen}>
           <div className={styles.resultMascot}>🎉</div>
           <h2 className={styles.resultTitle}>Hoàn thành!</h2>
@@ -247,7 +247,7 @@ export const ReadingMode: React.FC<ReadingModeProps> = ({ lessonId, vocabs }) =>
   };
 
   return (
-    <div className={styles.quizContainer} style={{ backgroundImage: 'url("/vietnam_watermark.svg")', backgroundSize: '60%', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', backgroundColor: '#F9F0DF' }}>
+    <div className={styles.quizContainer} style={{ backgroundImage: 'url("/vietnam_watermark.svg")', backgroundSize: '60%', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
       <div className={styles.quizHeader}>
         <button className={styles.hintBtn} onClick={handleSpeak}>
           <div className={styles.iconWrap}>

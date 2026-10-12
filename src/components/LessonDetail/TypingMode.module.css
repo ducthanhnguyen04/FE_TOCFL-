@@ -9,7 +9,6 @@
   overflow: hidden;
   min-height: 480px;
   animation: fadeIn 0.3s ease forwards;
-  background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');
 }
 
 .header {

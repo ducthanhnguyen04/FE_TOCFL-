@@ -4,12 +4,15 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
+import { LoginModal } from '@/components/Modal/LoginModal';
 
 interface UserContextType {
   user: User | null;
   isLoading: boolean;
   refreshUser: () => Promise<void>;
   logout: () => Promise<void>;
+  openLoginModal: () => void;
+  closeLoginModal: () => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -23,7 +26,11 @@ export const UserProvider = ({
 }) => {
   const [user, setUser] = useState<User | null>(initialUser);
   const [isLoading, setIsLoading] = useState(!initialUser);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const router = useRouter();
+
+  const openLoginModal = () => setIsLoginModalOpen(true);
+  const closeLoginModal = () => setIsLoginModalOpen(false);
 
   const refreshUser = async () => {
     const supabase = createClient();
@@ -57,8 +64,9 @@ export const UserProvider = ({
   }, [router]);
 
   return (
-    <UserContext.Provider value={{ user, isLoading, refreshUser, logout }}>
+    <UserContext.Provider value={{ user, isLoading, refreshUser, logout, openLoginModal, closeLoginModal }}>
       {children}
+      <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} />
     </UserContext.Provider>
   );
 };

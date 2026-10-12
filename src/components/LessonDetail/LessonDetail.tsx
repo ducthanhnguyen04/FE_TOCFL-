@@ -4,8 +4,10 @@ import styles from './LessonDetail.module.css';
 import { QuizMode } from './QuizMode';
 import { TypingMode } from './TypingMode';
 import { ReadingMode } from './ReadingMode';
+import { ListeningMode } from './ListeningMode';
 import { AutoPlayModal, AutoPlaySettings } from '../Modal/AutoPlayModal';
 import { useLanguage } from '@/providers/LanguageProvider';
+import { useUser } from '@/providers/UserProvider';
 
 interface LessonDetailProps {
   courseId: string;
@@ -17,6 +19,7 @@ import { createClient } from '@/lib/supabase/client';
 
 export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, onBack }) => {
   const { lang, t } = useLanguage();
+  const { user, isLoading: isUserLoading, openLoginModal } = useUser();
   
   const studyModes = [
     { id: 'flashcard', title: t('lesson.vocab'), status: t('lesson.unstudied') },
@@ -237,6 +240,36 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
     autoPlayRef.current = false;
   };
 
+  if (!isUserLoading && !user) {
+    return (
+      <div className={styles.lessonWrapper} style={{ animation: 'fadeIn 0.3s ease', textAlign: 'center', padding: '60px 20px' }}>
+        <div className="sketch-box" style={{ maxWidth: 480, margin: '0 auto', padding: '40px 24px', backgroundColor: 'var(--bg-paper)', borderRadius: 'var(--sketch-radius)', border: '2px solid var(--border-sketch)' }}>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>🔒</div>
+          <h2 style={{ fontSize: 22, fontWeight: 800, marginBottom: 8, color: 'var(--text-primary)' }}>Yêu cầu đăng nhập</h2>
+          <p style={{ fontSize: 15, color: 'var(--text-secondary)', marginBottom: 24, lineHeight: 1.5 }}>
+            Bạn cần đăng nhập để bắt đầu học bài, làm bài tập và lưu lại tiến độ học tập của mình.
+          </p>
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+            <button 
+              onClick={onBack}
+              className="sketch-cross"
+              style={{ padding: '10px 20px', borderRadius: 8, border: '1.5px solid var(--border-sketch)', background: 'transparent', fontWeight: 700, cursor: 'pointer' }}
+            >
+              Quay lại
+            </button>
+            <button 
+              onClick={openLoginModal}
+              className="sketch-cross"
+              style={{ padding: '10px 24px', borderRadius: 8, border: '2px solid var(--border-sketch)', background: 'var(--text-primary)', color: '#ffffff', fontWeight: 800, cursor: 'pointer' }}
+            >
+              Đăng nhập ngay
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.lessonWrapper} style={{ animation: 'fadeIn 0.3s ease' }}>
       <audio ref={audioRef} style={{ display: 'none' }} playsInline preload="auto" />
@@ -393,6 +426,12 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
       {activeMode === 'reading' && (
         <div key="reading">
           <ReadingMode lessonId={lessonId} vocabs={vocabs} />
+        </div>
+      )}
+
+      {activeMode === 'listening' && (
+        <div key="listening">
+          <ListeningMode lessonId={lessonId} />
         </div>
       )}
 
