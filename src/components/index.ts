@@ -15,4 +15,5 @@ export { CourseDetail } from './CourseDetail/CourseDetail';
 export { LessonDetail } from './LessonDetail/LessonDetail';
 export { PracticeSheetModal } from './Modal/PracticeSheetModal';
 export { MyVocabView } from './MyVocab/MyVocabView';
+export { RoleplayView } from './Roleplay/RoleplayView';
 export * from './RadicalsList/RadicalsList';

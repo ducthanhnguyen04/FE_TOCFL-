@@ -72,34 +72,32 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </div>
               </button>
 
-              <>
-                {isSubmenuOpen && item.subItems && (
-                  <div className={`${styles.submenuFloating} sketch-cross`}>
-                    {item.subItems.map((sub) => (
-                      <button
-                        key={sub.id}
-                        type="button"
-                        className={`${styles.subMenuItem} ${
-                          activeId === sub.id ? styles.subMenuItemActive : ''
-                        }`}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          onSelectMenu?.(sub as MenuItem);
-                          setOpenSubmenuId(null);
-                        }}
-                        style={{ position: 'relative', zIndex: 9999, pointerEvents: 'auto', cursor: 'pointer' }}
-                      >
-                        {sub.badge && (
-                          <span className={styles.subMenuBadge}>{sub.badge}</span>
-                        )}
-                        <MenuIcon name={sub.iconName} size={20} />
-                        <span className={styles.subMenuLabel}>{t(`menu.${sub.id}`) || sub.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </>
+              {isSubmenuOpen && item.subItems && (
+                <div className={`${styles.submenuFloating} sketch-cross`}>
+                  {item.subItems.map((sub) => (
+                    <button
+                      key={sub.id}
+                      type="button"
+                      className={`${styles.subMenuItem} ${
+                        activeId === sub.id ? styles.subMenuItemActive : ''
+                      }`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        onSelectMenu?.(sub as MenuItem);
+                        setOpenSubmenuId(null);
+                      }}
+                      style={{ position: 'relative', zIndex: 9999, pointerEvents: 'auto', cursor: 'pointer' }}
+                    >
+                      {sub.badge && (
+                        <span className={styles.subMenuBadge}>{sub.badge}</span>
+                      )}
+                      <MenuIcon name={sub.iconName} size={20} />
+                      <span className={styles.subMenuLabel}>{t(`menu.${sub.id}`) || sub.label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </li>
           );
         })}

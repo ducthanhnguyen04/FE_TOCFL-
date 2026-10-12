@@ -20,6 +20,7 @@ import {
   BookMarked,
   ArrowRightLeft,
   ScanSearch,
+  MessagesSquare,
 } from 'lucide-react';
 
 interface MenuIconProps {
@@ -70,6 +71,8 @@ export const MenuIcon: React.FC<MenuIconProps> = ({ name, className, size = 20 }
       return <ArrowRightLeft size={size} className={className} />;
     case 'ScanSearch':
       return <ScanSearch size={size} className={className} />;
+    case 'MessagesSquare':
+      return <MessagesSquare size={size} className={className} />;
     default:
       return <Home size={size} className={className} />;
   }

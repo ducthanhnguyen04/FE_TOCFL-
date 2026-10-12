@@ -47,9 +47,9 @@ export const MENU_ITEMS: MenuItem[] = [
     iconName: 'Mic',
   },
   {
-    id: 'lessons',
-    label: 'Bài khoá',
-    iconName: 'BookOpen',
+    id: 'roleplay',
+    label: 'Hội thoại nhập vai',
+    iconName: 'MessagesSquare',
   },
   {
     id: 'certificates',

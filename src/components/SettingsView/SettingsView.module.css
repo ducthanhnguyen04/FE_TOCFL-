@@ -1,8 +1,7 @@
 .settingsView {
-  padding: 40px;
-  max-width: 1000px;
-  margin: 0 auto;
+  padding: 8px 12px 60px;
   width: 100%;
+  animation: fadeIn 0.3s ease;
 }
 
 .pageTitle {

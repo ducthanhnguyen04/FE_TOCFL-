@@ -28,6 +28,7 @@ const translations = {
     'menu.dict-search': 'Tra từ điển',
     'menu.character-analysis': 'Phân tích Hán tự',
     'menu.shadowing': 'Shadowing',
+    'menu.roleplay': 'Hội thoại nhập vai',
     'menu.lessons': 'Bài khoá',
     'menu.certificates': 'Luyện thi chứng chỉ',
     'menu.create-file': 'Tạo file',
@@ -190,6 +191,7 @@ const translations = {
     'menu.dict-search': 'Search Dictionary',
     'menu.character-analysis': 'Character Analysis',
     'menu.shadowing': 'Shadowing',
+    'menu.roleplay': 'AI Roleplay',
     'menu.lessons': 'Lessons',
     'menu.certificates': 'Certificates',
     'menu.create-file': 'Create File',
@@ -352,6 +354,7 @@ const translations = {
     'menu.dict-search': 'Cari di Kamus',
     'menu.character-analysis': 'Analisis Hanzi',
     'menu.shadowing': 'Shadowing',
+    'menu.roleplay': 'Bermain Peran AI',
     'menu.lessons': 'Teks Pelajaran',
     'menu.certificates': 'Persiapan Sertifikasi',
     'menu.create-file': 'Buat file',
@@ -366,6 +369,11 @@ const translations = {
     'header.logout': 'Keluar',
     'header.login': 'Masuk',
     'header.defaultUser': 'Pengguna',
+    'hero.hello': 'Halo',
+    'hero.defaultName': 'teman',
+    'hero.intro': 'Lanjutkan perjalanan kosakata bahasa Taiwan Anda — sedikit setiap hari sudah cukup.',
+    'hero.joinCommunity': 'Bergabunglah dengan grup belajar bersama semua orang:',
+    'hero.communityName': 'Belajar bahasa Taiwan setiap hari',
     'course.home': 'Beranda',
     'course.lessonCount': 'pelajaran',
     'course.skills': 'KETERAMPILAN',
@@ -382,6 +390,25 @@ const translations = {
     'practice.title': 'Lembar Latihan Menulis A4',
     'practice.print': 'Cetak',
     'practice.close': 'Tutup',
+    'chat.message': 'Pesan',
+    'chat.botTitle': '🤖 Asisten Nhai TOCFL',
+    'chat.botGreeting': 'Halo! Saya asisten Nhai TOCFL. Anda ingin mulai belajar level berapa?',
+    'chat.quick1': 'Jalur TOCFL 1',
+    'chat.quick2': 'TOCFL 3.0 vs 2.0?',
+    'chat.quick3': 'Tips Hanzi',
+    'chat.closeAria': 'Tutup obrolan',
+    'chat.inputPlaceholder': 'Ketik pertanyaan...',
+    'chat.sendAria': 'Kirim pesan',
+    'chat.triggerAria': 'Obrolan bantuan',
+    'chat.replyDefault': 'Terima kasih atas pertanyaan Anda! Silakan klik salah satu kartu TOCFL di layar untuk mulai belajar!',
+    'chat.replyRoute': 'TOCFL 1 baru mencakup 333 kosakata dan 41 pola kalimat dasar, sebaiknya pelajari pelafalan pinyin standar terlebih dahulu!',
+    'chat.replyTOCFL3': 'TOCFL 3.0 dibagi menjadi 3 band dan 9 level, menambahkan lebih banyak kosakata praktis dan keterampilan komunikasi nyata!',
+    'settings.title': 'Pengaturan',
+    'settings.subtitle': 'Mode tampilan, bahasa antarmuka, suara bacaan, dan asisten AI.',
+    'settings.theme': 'Mode Tampilan',
+    'settings.theme.light': 'Terang',
+    'settings.theme.dark': 'Gelap',
+    'settings.language': 'Bahasa Antarmuka',
     'home.title': 'Beranda',
     'lesson.vocab': 'Kosakata',
     'lesson.grammar': 'Tata Bahasa',
@@ -453,7 +480,7 @@ export const LanguageProvider = ({ children }: { children: React.ReactNode }) =>
   };
 
   const t = (key: string): string => {
-    return (translations[lang] as any)[key] || key;
+    return (translations[lang] as any)?.[key] || (translations['vi'] as any)?.[key] || key;
   };
 
   return (
