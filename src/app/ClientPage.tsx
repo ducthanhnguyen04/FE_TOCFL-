@@ -19,6 +19,7 @@ import {
   CourseDetail,
   LessonDetail,
   RadicalsList,
+  MyVocabView,
 } from '@/components';
 import { TOCFLLevelItem, MenuItem } from '@/types';
 import { TOCFL_LEVELS } from '@/data/tocflData';
@@ -88,7 +89,9 @@ export default function ClientPage({ courseId, lessonId, initialActiveMenuId = '
     const routeMapping: Record<string, string> = {
       'home': '/',
       'radicals': '/radicals',
-      'account_settings': '/settings'
+      'account_settings': '/settings',
+      'vocab': '/my-vocab',
+      'my-vocab': '/my-vocab'
     };
 
     if (routeMapping[item.id]) {
@@ -179,6 +182,8 @@ export default function ClientPage({ courseId, lessonId, initialActiveMenuId = '
               <SettingsView />
             ) : activeMenuId === 'radicals' ? (
               <RadicalsList />
+            ) : (activeMenuId === 'vocab' || activeMenuId === 'my-vocab') ? (
+              <MyVocabView />
             ) : (
               <>
                 {/* Hero Greeting Section */}

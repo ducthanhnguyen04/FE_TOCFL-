@@ -6,18 +6,21 @@ import { TypingMode } from './TypingMode';
 import { ReadingMode } from './ReadingMode';
 import { ListeningMode } from './ListeningMode';
 import { AutoPlayModal, AutoPlaySettings } from '../Modal/AutoPlayModal';
+import { PracticeSheetModal } from '../Modal/PracticeSheetModal';
 import { useLanguage } from '@/providers/LanguageProvider';
 import { useUser } from '@/providers/UserProvider';
 
 interface LessonDetailProps {
-  courseId: string;
-  lessonId: string;
+  courseId?: string;
+  lessonId?: string;
+  customVocabs?: any[];
+  customTitle?: string;
   onBack: () => void;
 }
 
 import { createClient } from '@/lib/supabase/client';
 
-export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, onBack }) => {
+export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, customVocabs, customTitle, onBack }) => {
   const { lang, t } = useLanguage();
   const { user, isLoading: isUserLoading, openLoginModal } = useUser();
   
@@ -36,12 +39,22 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
   const [isFlipped, setIsFlipped] = useState(false);
   const [vocabs, setVocabs] = useState<any[]>([]);
   const [isAutoPlayModalOpen, setIsAutoPlayModalOpen] = useState(false);
+  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [isAutoPlaying, setIsAutoPlaying] = useState(false);
   const autoPlayRef = React.useRef<boolean>(false);
   const audioRef = React.useRef<HTMLAudioElement | null>(null);
-  const [lessonName, setLessonName] = useState(t('lesson.loading'));
+  const [lessonName, setLessonName] = useState(customTitle || t('lesson.loading'));
 
   React.useEffect(() => {
+    if (customVocabs) {
+      setVocabs(customVocabs);
+      if (customTitle) setLessonName(customTitle);
+      setCurrentIndex(0);
+      return;
+    }
+
+    if (!lessonId) return;
+
     const fetchData = async () => {
       const supabase = createClient();
       
@@ -425,13 +438,13 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
 
       {activeMode === 'reading' && (
         <div key="reading">
-          <ReadingMode lessonId={lessonId} vocabs={vocabs} />
+          <ReadingMode lessonId={lessonId || ''} vocabs={vocabs} />
         </div>
       )}
 
       {activeMode === 'listening' && (
         <div key="listening">
-          <ListeningMode lessonId={lessonId} />
+          <ListeningMode lessonId={lessonId || ''} />
         </div>
       )}
 
@@ -464,7 +477,12 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
       {/* List Header */}
       <div className={styles.listHeader}>
         <div className={styles.listActions}>
-          <button className={`${styles.listActionBtn} sketch-cross`}><Printer size={14} /> {t('lesson.print')}</button>
+          <button 
+            className={`${styles.listActionBtn} sketch-cross`}
+            onClick={() => setIsPrintModalOpen(true)}
+          >
+            <Printer size={14} /> {t('lesson.print')}
+          </button>
           <button className={`${styles.listActionBtn} ${styles.btnYellow} sketch-cross`}><Star size={14} /> {t('lesson.addReview')}</button>
         </div>
       </div>
@@ -509,6 +527,16 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
         isOpen={isAutoPlayModalOpen} 
         onClose={() => setIsAutoPlayModalOpen(false)} 
         onStart={startAutoPlay} 
+      />
+
+      <PracticeSheetModal
+        isOpen={isPrintModalOpen}
+        onClose={() => setIsPrintModalOpen(false)}
+        items={vocabs.map(v => ({
+          char: v.hanzi,
+          pinyin: v.pinyin,
+          meaning: getMeaning(v)
+        }))}
       />
     </div>
   );

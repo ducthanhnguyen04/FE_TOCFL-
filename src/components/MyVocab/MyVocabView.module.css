@@ -1,0 +1,656 @@
+.vocabWrapper {
+  padding: 8px 12px 60px;
+  animation: fadeIn 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.headerTitleArea {
+  margin-bottom: 24px;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.titleIcon {
+  font-size: 30px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  font-size: 14.5px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+/* Auth required banner box */
+.authBox {
+  background-color: var(--bg-paper);
+  border: 2px solid var(--border-sketch);
+  border-radius: var(--sketch-radius);
+  box-shadow: 4px 4px 0px var(--border-sketch);
+  padding: 60px 24px;
+  text-align: center;
+  max-width: 680px;
+  margin: 40px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.authIcon {
+  width: 56px;
+  height: 56px;
+  background-color: #f1cf5b;
+  border: 2px solid var(--border-sketch);
+  box-shadow: 2px 2px 0px var(--border-sketch);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.authTitle {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.authSubtitle {
+  font-size: 15px;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+  max-width: 440px;
+}
+
+.loginBtn {
+  background-color: #272727;
+  color: #ffffff;
+  padding: 10px 24px;
+  border-radius: var(--sketch-radius);
+  border: 2px solid var(--border-sketch);
+  box-shadow: 2px 2px 0px var(--border-sketch);
+  font-size: 14px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.loginBtn:hover {
+  background-color: #383838;
+  transform: translateY(-1px);
+}
+
+/* Empty state box */
+.emptyBox {
+  background-color: var(--bg-paper);
+  border: 2px solid var(--border-sketch);
+  border-radius: var(--sketch-radius);
+  box-shadow: 4px 4px 0px var(--border-sketch);
+  padding: 60px 24px;
+  text-align: center;
+  max-width: 760px;
+  margin: 30px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.emptyIcon {
+  width: 56px;
+  height: 56px;
+  background-color: #f1cf5b;
+  border: 2px solid var(--border-sketch);
+  box-shadow: 2px 2px 0px var(--border-sketch);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.emptyTitle {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.emptySubtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+.createSetBtn {
+  background-color: #272727;
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: var(--sketch-radius);
+  border: 2px solid var(--border-sketch);
+  box-shadow: 2px 2px 0px var(--border-sketch);
+  font-size: 14px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.createSetBtn:hover {
+  background-color: #383838;
+  transform: translateY(-1px);
+}
+
+.topActionRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+/* Sets Grid */
+.setsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 20px;
+  margin-top: 10px;
+}
+
+.setCard {
+  background-color: var(--bg-paper);
+  border: 2px solid var(--border-sketch);
+  border-radius: var(--sketch-radius);
+  box-shadow: 3.5px 3.5px 0px var(--border-sketch);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.setCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 4px 6px 0px var(--border-sketch);
+}
+
+.cardClickableArea {
+  cursor: pointer;
+  border-radius: 8px;
+  transition: opacity 0.15s;
+}
+
+.cardClickableArea:hover {
+  opacity: 0.85;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.cardIcon {
+  width: 44px;
+  height: 44px;
+  background-color: #f1cf5b;
+  border: 2px solid var(--border-sketch);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cardMeta {
+  flex: 1;
+}
+
+.setName {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 2px;
+}
+
+.setCount {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin: 0;
+}
+
+.progressWrap {
+  margin-bottom: 16px;
+}
+
+.progressHeader {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.progressBar {
+  height: 8px;
+  background-color: rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid var(--border-sketch);
+}
+
+.progressFill {
+  height: 100%;
+  background-color: #27ae60;
+  border-radius: 4px;
+}
+
+.cardActions {
+  display: flex;
+  border-top: 1.5px solid var(--border-sketch);
+  padding-top: 12px;
+  gap: 8px;
+}
+
+.cardActionBtn {
+  flex: 1;
+  padding: 8px 6px;
+  font-size: 13px;
+  font-weight: 700;
+  background: transparent;
+  border: 1.5px solid var(--border-sketch);
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: var(--text-primary);
+  transition: all 0.15s;
+}
+
+.cardActionBtn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.cardActionDelete {
+  color: #c0392b;
+  border-color: #c0392b;
+}
+
+.cardActionDelete:hover {
+  background-color: #fde8e8;
+}
+
+/* Modal Popup Tạo bộ từ vựng */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.modalContent {
+  background-color: var(--bg-paper);
+  border: 2px solid var(--border-sketch);
+  border-radius: var(--sketch-radius);
+  box-shadow: 4px 5px 0px var(--border-sketch);
+  width: 100%;
+  max-width: 440px;
+  padding: 24px;
+  position: relative;
+  animation: fadeIn 0.2s ease;
+}
+
+.modalClose {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modalTitle {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 16px;
+}
+
+.modalInput {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 15px;
+  font-family: inherit;
+  border: 1.5px solid var(--border-sketch);
+  border-radius: 8px;
+  background-color: rgba(0, 0, 0, 0.03);
+  outline: none;
+  margin-bottom: 20px;
+  color: var(--text-primary);
+}
+
+.modalInput:focus {
+  border-color: #2b7fd4;
+  background-color: #ffffff;
+}
+
+.modalBtns {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.btnCancel {
+  padding: 8px 20px;
+  background: transparent;
+  border: 1.5px solid var(--border-sketch);
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--text-primary);
+}
+
+.btnSubmit {
+  padding: 8px 22px;
+  background: #7f8c8d;
+  color: #ffffff;
+  border: 1.5px solid var(--border-sketch);
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btnSubmitActive {
+  background: #272727;
+}
+
+.btnSubmit:hover {
+  transform: translateY(-1px);
+}
+
+/* =========================================
+   DETAIL & TABLE VIEW CHO MY VOCABULARIES
+   ========================================= */
+.detailHeader {
+  margin-bottom: 24px;
+}
+
+.backBtn {
+  background: transparent;
+  border: none;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.backBtn:hover {
+  color: var(--text-primary);
+}
+
+.detailSubtitle {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.detailTitleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 4px;
+}
+
+.detailTitleLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.detailActions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.detailBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  background: var(--bg-paper);
+  border: 1.5px solid var(--border-sketch);
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: all 0.15s;
+}
+
+.detailBtn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.detailBtnPrimary {
+  background: #272727;
+  color: #ffffff;
+  border-color: #272727;
+}
+
+.detailBtnPrimary:hover {
+  background: #383838;
+}
+
+.detailBtnPlay {
+  background-color: #7b8084;
+  color: #ffffff;
+  border-color: #272727;
+}
+
+.detailBtnPlay:hover {
+  background-color: #5c6063;
+  transform: translateY(-1px);
+}
+
+/* Table Container */
+.tableContainer {
+  background-color: var(--bg-paper);
+  border: 2px solid var(--border-sketch);
+  border-radius: var(--sketch-radius);
+  box-shadow: 4px 4px 0px var(--border-sketch);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.searchWrap {
+  padding: 16px 20px;
+  border-bottom: 1.5px solid var(--border-sketch);
+}
+
+.searchInput {
+  width: 100%;
+  max-width: 440px;
+  padding: 8px 14px;
+  font-size: 14px;
+  border: 1.5px solid var(--border-sketch);
+  border-radius: 6px;
+  background: transparent;
+  outline: none;
+}
+
+.tableHeader {
+  display: grid;
+  grid-template-columns: 44px 1.2fr 1.2fr 1.5fr 44px;
+  padding: 10px 16px;
+  background-color: #faeedb;
+  border-bottom: 1.5px solid var(--border-sketch);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-primary);
+  align-items: center;
+}
+
+.vocabRow {
+  display: flex;
+  flex-direction: column;
+  padding: 14px 16px;
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.15);
+  gap: 10px;
+}
+
+.vocabRow:last-child {
+  border-bottom: none;
+}
+
+.mainInputsRow {
+  display: grid;
+  grid-template-columns: 44px 1.2fr 1.2fr 1.5fr 44px;
+  gap: 12px;
+  align-items: center;
+}
+
+.rowNum {
+  font-weight: 800;
+  font-size: 14px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.tableInput {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1.5px solid var(--border-sketch);
+  border-radius: 6px;
+  background: transparent;
+  outline: none;
+  font-family: inherit;
+  color: var(--text-primary);
+}
+
+.tableInput:focus {
+  border-color: #2b7fd4;
+  background: #ffffff;
+}
+
+.deleteRowBtn {
+  background: transparent;
+  border: 1.5px solid var(--border-sketch);
+  border-radius: 6px;
+  color: #c0392b;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.deleteRowBtn:hover {
+  background-color: #fde8e8;
+}
+
+.exampleInputsRow {
+  margin-left: 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 600px;
+}
+
+.addVocabBtnRow {
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+  border-top: 1.5px dashed rgba(0, 0, 0, 0.15);
+}
+
+.addVocabBtn {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-weight: 800;
+  font-size: 14px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+}
+
+.addVocabBtn:hover {
+  text-decoration: underline;
+}
+
+.toast {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #272727;
+  color: #ffffff;
+  padding: 10px 22px;
+  border-radius: var(--sketch-radius);
+  border: 1.5px solid #111;
+  box-shadow: 2px 3px 0px rgba(0, 0, 0, 0.4);
+  font-size: 14px;
+  font-weight: 700;
+  z-index: 9999;
+  animation: toastIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
