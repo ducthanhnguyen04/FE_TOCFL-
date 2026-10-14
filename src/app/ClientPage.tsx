@@ -21,6 +21,8 @@ import {
   RadicalsList,
   MyVocabView,
   RoleplayView,
+  AdminUsersView,
+  AdminCoursesView,
 } from '@/components';
 import { TOCFLLevelItem, MenuItem } from '@/types';
 import { TOCFL_LEVELS } from '@/data/tocflData';
@@ -93,7 +95,10 @@ export default function ClientPage({ courseId, lessonId, initialActiveMenuId = '
       'account_settings': '/settings',
       'vocab': '/my-vocab',
       'my-vocab': '/my-vocab',
-      'roleplay': '/roleplay'
+      'roleplay': '/roleplay',
+      'admin': '/admin/users',
+      'admin-users': '/admin/users',
+      'admin-courses': '/admin/courses'
     };
 
     if (routeMapping[item.id]) {
@@ -188,6 +193,10 @@ export default function ClientPage({ courseId, lessonId, initialActiveMenuId = '
               <MyVocabView />
             ) : activeMenuId === 'roleplay' ? (
               <RoleplayView />
+            ) : (activeMenuId === 'admin-users' || activeMenuId === 'admin') ? (
+              <AdminUsersView onBack={() => setActiveMenuId('home')} />
+            ) : activeMenuId === 'admin-courses' ? (
+              <AdminCoursesView onBack={() => setActiveMenuId('home')} />
             ) : (
               <>
                 {/* Hero Greeting Section */}

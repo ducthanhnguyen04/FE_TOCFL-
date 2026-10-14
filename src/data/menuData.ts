@@ -72,6 +72,18 @@ export const MENU_ITEMS: MenuItem[] = [
     iconName: 'MessageSquareText',
   },
   {
+    id: 'admin',
+    label: 'Admin',
+    iconName: 'ShieldCheck',
+    hasSubmenu: true,
+    subItems: [
+      { id: 'admin-users', label: 'Quản lý user', iconName: 'Users' },
+      { id: 'admin-courses', label: 'Quản lý giáo trình', iconName: 'Layers' },
+      { id: 'admin-lessons', label: 'Quản lý Lesson', iconName: 'FolderKanban' },
+      { id: 'admin-vocabularies', label: 'Quản lý Từ Vựng', iconName: 'BookA' },
+    ],
+  },
+  {
     id: 'settings',
     label: 'Cài đặt',
     iconName: 'Settings',

@@ -21,6 +21,10 @@ import {
   ArrowRightLeft,
   ScanSearch,
   MessagesSquare,
+  ShieldCheck,
+  Users,
+  Layers,
+  FolderKanban,
 } from 'lucide-react';
 
 interface MenuIconProps {
@@ -73,6 +77,15 @@ export const MenuIcon: React.FC<MenuIconProps> = ({ name, className, size = 20 }
       return <ScanSearch size={size} className={className} />;
     case 'MessagesSquare':
       return <MessagesSquare size={size} className={className} />;
+    case 'ShieldCheck':
+    case 'Shield':
+      return <ShieldCheck size={size} className={className} />;
+    case 'Users':
+      return <Users size={size} className={className} />;
+    case 'Layers':
+      return <Layers size={size} className={className} />;
+    case 'FolderKanban':
+      return <FolderKanban size={size} className={className} />;
     default:
       return <Home size={size} className={className} />;
   }

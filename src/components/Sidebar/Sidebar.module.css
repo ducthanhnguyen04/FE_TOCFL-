@@ -10,14 +10,37 @@
     width: var(--sidebar-width);
     min-width: var(--sidebar-width);
     border-right: 1.5px solid var(--border-sketch);
-    padding: 12px 6px;
-    gap: 8px;
+    padding: 8px 0 6px 0;
     background-color: rgba(250, 248, 240, 0.7);
-    min-height: calc(100vh - var(--header-height));
+    height: calc(100vh - var(--header-height));
+    max-height: calc(100vh - var(--header-height));
     position: sticky;
     top: var(--header-height);
     z-index: 40;
+    box-sizing: border-box;
+    overflow: hidden;
   }
+}
+
+.menuScrollArea {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 6px;
+  /* Hide scrollbar completely while maintaining scrollability */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+.menuScrollArea::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 .menuList {
@@ -27,6 +50,19 @@
   align-items: center;
   gap: 6px;
   width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.bottomSection {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 6px 2px;
+  border-top: 1px dashed rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+  background-color: transparent;
 }
 
 .menuItem {
@@ -108,10 +144,7 @@
 
 /* Floating Submenu */
 .submenuFloating {
-  position: absolute;
-  left: calc(100% + 12px);
-  top: 50%;
-  transform: translateY(-50%);
+  position: fixed;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -121,7 +154,7 @@
   box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.2);
   padding: 10px 16px;
   gap: 20px;
-  z-index: 100;
+  z-index: 9999;
   white-space: nowrap;
   animation: slideInSubmenu 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }

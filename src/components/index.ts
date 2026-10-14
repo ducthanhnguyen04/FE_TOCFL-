@@ -17,3 +17,5 @@ export { PracticeSheetModal } from './Modal/PracticeSheetModal';
 export { MyVocabView } from './MyVocab/MyVocabView';
 export { RoleplayView } from './Roleplay/RoleplayView';
 export * from './RadicalsList/RadicalsList';
+export { AdminUsersView } from './Admin/AdminUsersView';
+export { AdminCoursesView } from './Admin/AdminCoursesView';

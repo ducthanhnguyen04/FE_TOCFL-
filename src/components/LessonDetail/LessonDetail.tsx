@@ -258,9 +258,9 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
       <div className={styles.lessonWrapper} style={{ animation: 'fadeIn 0.3s ease', textAlign: 'center', padding: '60px 20px' }}>
         <div className="sketch-box" style={{ maxWidth: 480, margin: '0 auto', padding: '40px 24px', backgroundColor: 'var(--bg-paper)', borderRadius: 'var(--sketch-radius)', border: '2px solid var(--border-sketch)' }}>
           <div style={{ fontSize: 48, marginBottom: 16 }}>🔒</div>
-          <h2 style={{ fontSize: 22, fontWeight: 800, marginBottom: 8, color: 'var(--text-primary)' }}>Yêu cầu đăng nhập</h2>
+          <h2 style={{ fontSize: 22, fontWeight: 800, marginBottom: 8, color: 'var(--text-primary)' }}>{t('lesson.loginRequired')}</h2>
           <p style={{ fontSize: 15, color: 'var(--text-secondary)', marginBottom: 24, lineHeight: 1.5 }}>
-            Bạn cần đăng nhập để bắt đầu học bài, làm bài tập và lưu lại tiến độ học tập của mình.
+            {t('lesson.loginRequiredDesc')}
           </p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
             <button 
@@ -268,14 +268,14 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
               className="sketch-cross"
               style={{ padding: '10px 20px', borderRadius: 8, border: '1.5px solid var(--border-sketch)', background: 'transparent', fontWeight: 700, cursor: 'pointer' }}
             >
-              Quay lại
+              {t('common.back')}
             </button>
             <button 
               onClick={openLoginModal}
               className="sketch-cross"
               style={{ padding: '10px 24px', borderRadius: 8, border: '2px solid var(--border-sketch)', background: 'var(--text-primary)', color: '#ffffff', fontWeight: 800, cursor: 'pointer' }}
             >
-              Đăng nhập ngay
+              {t('login.loginNow')}
             </button>
           </div>
         </div>
@@ -367,7 +367,7 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
                 ))}
               </div>
 
-              <div className={styles.vocabTag}><span>{currentVocab.tag}</span></div>
+              <div className={styles.vocabTag}><span>{currentVocab.tag === 'Từ vựng' ? t('lesson.vocab') : currentVocab.tag}</span></div>
               <div className={styles.vocabPinyin}><span>{currentVocab.pinyin}</span></div>
               <div className={styles.flipHint}><span>{t('lesson.hint')}</span></div>
               
@@ -390,7 +390,7 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
                   <button className={styles.exVolumeBtn} onClick={e => { e.stopPropagation(); handleSpeak(currentVocab.example, e); }}><Volume2 size={16} /></button>
                 </div>
               )}
-              <div className={styles.flipHint}><span>✨ Click để quay lại</span></div>
+              <div className={styles.flipHint}><span>{t('lesson.flipBackHint')}</span></div>
             </div>
 
           </div>
@@ -495,7 +495,7 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
                 <span className={styles.vcardNum}>{idx + 1}.</span>
                 <div className={styles.vcardHanziArea}>
                   <div className={styles.vcardHanzi}>{vocab.hanzi}</div>
-                  <div className={styles.vcardTag}>{vocab.tag}</div>
+                  <div className={styles.vcardTag}>{vocab.tag === 'Từ vựng' ? t('lesson.vocab') : vocab.tag}</div>
                 </div>
               </div>
               <div className={styles.vcardRight}>

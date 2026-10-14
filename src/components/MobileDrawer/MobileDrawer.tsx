@@ -6,6 +6,8 @@ import styles from './MobileDrawer.module.css';
 import { MENU_ITEMS } from '@/data/menuData';
 import { MenuIcon } from '../Sidebar/MenuIcon';
 import { MenuItem } from '@/types';
+import { useLanguage } from '@/providers/LanguageProvider';
+import { useUser } from '@/providers/UserProvider';
 
 interface MobileDrawerProps {
   isOpen: boolean;
@@ -22,6 +24,8 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
   onSelectMenu,
   onLoginClick,
 }) => {
+  const { t } = useLanguage();
+  const { isAdmin } = useUser();
   const [openSubmenuId, setOpenSubmenuId] = React.useState<string | null>(null);
 
   const handleMenuClick = (item: MenuItem) => {
@@ -65,7 +69,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
             type="button"
             className={styles.closeBtn}
             onClick={onClose}
-            aria-label="Đóng menu"
+            aria-label={t('drawer.close') || 'Đóng menu'}
           >
             <X size={18} />
           </button>
@@ -75,7 +79,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
 
         {/* Navigation List */}
         <ul className={styles.menuList}>
-          {MENU_ITEMS.map((item) => {
+          {MENU_ITEMS.filter((item) => item.id !== 'admin' || isAdmin).map((item) => {
             const isActive = item.id === activeId || item.subItems?.some(sub => sub.id === activeId);
             const isSubmenuOpen = openSubmenuId === item.id;
             
@@ -87,7 +91,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                   onClick={() => handleMenuClick(item)}
                 >
                   <MenuIcon name={item.iconName} size={18} />
-                  <span className={styles.menuLabel}>{item.label}</span>
+                  <span className={styles.menuLabel}>{t(`menu.${item.id}`) || item.label}</span>
                   {item.hasSubmenu && <span className={styles.chevron}>{isSubmenuOpen ? 'v' : '>'}</span>}
                 </button>
 
@@ -108,7 +112,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                           <span className={styles.mobileSubBadge}>{sub.badge}</span>
                         )}
                         <MenuIcon name={sub.iconName} size={16} />
-                        <span className={styles.mobileSubLabel}>{sub.label}</span>
+                        <span className={styles.mobileSubLabel}>{t(`menu.${sub.id}`) || sub.label}</span>
                       </button>
                     ))}
                   </div>
@@ -120,7 +124,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
 
         {/* Footer */}
         <div className={styles.drawerFooter}>
-          <p>© 2026 Nhai TOCFL • Học vui mỗi ngày</p>
+          <p>© 2026 Nhai TOCFL • {t('drawer.footer') || 'Học vui mỗi ngày'}</p>
         </div>
       </div>
     </div>
