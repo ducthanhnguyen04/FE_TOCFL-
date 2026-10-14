@@ -206,21 +206,23 @@ export default function ClientPage({ courseId, lessonId, initialActiveMenuId = '
                 />
 
                 {/* Series Sections with Cards */}
-                {seriesList.map(series => (
-                  <TOCFLSection 
-                    key={series.id}
-                    title={series.name}
-                    levels={(series.books || []).map((book: any, index: number) => ({
-                      id: book.id,
-                      title: book.bookName,
-                      level: index + 1,
-                      wordCount: 0,
-                      patternCount: 0,
-                      description: ''
-                    }))} 
-                    onCardClick={handleCardClick} 
-                  />
-                ))}
+                <div id="tocfl-section">
+                  {seriesList.map(series => (
+                    <TOCFLSection 
+                      key={series.id}
+                      title={series.name}
+                      levels={(series.books || []).map((book: any, index: number) => ({
+                        id: book.id,
+                        title: book.bookName,
+                        level: index + 1,
+                        wordCount: 0,
+                        patternCount: 0,
+                        description: ''
+                      }))} 
+                      onCardClick={handleCardClick} 
+                    />
+                  ))}
+                </div>
               </>
             )}
 

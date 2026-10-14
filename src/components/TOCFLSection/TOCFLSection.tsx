@@ -17,7 +17,7 @@ export const TOCFLSection: React.FC<TOCFLSectionProps> = ({ title, levels, onCar
   const { t } = useLanguage();
 
   return (
-    <section className={styles.section} id="tocfl-section">
+    <section className={styles.section}>
       {/* Section Header */}
       <div className={styles.sectionHeader}>
         <div className={styles.pencilIndicator} aria-hidden="true" />

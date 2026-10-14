@@ -47,6 +47,13 @@ export const AdminUsersView: React.FC<AdminUsersViewProps> = ({ onBack }) => {
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [premiumFilter, setPremiumFilter] = useState<string>('all');
 
+  // Toast
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
   // Modal States
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<UserItem | null>(null);
@@ -147,23 +154,8 @@ export const AdminUsersView: React.FC<AdminUsersViewProps> = ({ onBack }) => {
     if (!formName.trim() || !formEmail.trim()) return;
 
     if (editingUser) {
-      // Update existing
-      const updatedList = users.map(u => {
-        if (u.id === editingUser.id) {
-          return {
-            ...u,
-            userName: formName,
-            email: formEmail,
-            role: formRole,
-            isPremium: formIsPremium
-          };
-        }
-        return u;
-      });
-      setUsers(updatedList);
-
       try {
-        await fetch('/api/admin/users', {
+        const res = await fetch('/api/admin/users', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -175,25 +167,20 @@ export const AdminUsersView: React.FC<AdminUsersViewProps> = ({ onBack }) => {
             isPremium: formIsPremium
           })
         });
-      } catch (err) {
-        console.warn('Lỗi cập nhật qua server API', err);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Lỗi cập nhật người dùng');
+
+        showToast('Đã lưu thông tin người dùng thành công!');
+        setIsEditModalOpen(false);
+        fetchUsers();
+      } catch (err: any) {
+        alert(err.message || 'Lỗi cập nhật qua server API');
       }
     } else {
       // Create new
       const newId = `user-${Date.now()}`;
-      const newUser: UserItem = {
-        id: newId,
-        userName: formName,
-        email: formEmail,
-        role: formRole,
-        isPremium: formIsPremium,
-        avatarUrl: null,
-        createdAt: new Date().toISOString().split('T')[0]
-      };
-      setUsers([newUser, ...users]);
-
       try {
-        await fetch('/api/admin/users', {
+        const res = await fetch('/api/admin/users', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -205,20 +192,23 @@ export const AdminUsersView: React.FC<AdminUsersViewProps> = ({ onBack }) => {
             isPremium: formIsPremium
           })
         });
-      } catch (err) {
-        console.warn('Lỗi thêm người dùng qua server API', err);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Lỗi thêm người dùng');
+
+        showToast('Đã thêm người dùng mới!');
+        setIsEditModalOpen(false);
+        fetchUsers();
+      } catch (err: any) {
+        alert(err.message || 'Lỗi thêm người dùng qua server API');
       }
     }
-
-    setIsEditModalOpen(false);
   };
 
   // Fast toggle Role directly via Server API
   const handleToggleRole = async (user: UserItem) => {
     const nextRole: 'admin' | 'user' = user.role === 'admin' ? 'user' : 'admin';
-    setUsers(prev => prev.map(u => u.id === user.id ? { ...u, role: nextRole } : u));
     try {
-      await fetch('/api/admin/users', {
+      const res = await fetch('/api/admin/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -227,17 +217,23 @@ export const AdminUsersView: React.FC<AdminUsersViewProps> = ({ onBack }) => {
           role: nextRole
         })
       });
-    } catch (e) {
-      console.warn('Lỗi đổi vai trò qua server API', e);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Lỗi cập nhật vai trò');
+
+      setUsers(prev => prev.map(u => u.id === user.id ? { ...u, role: nextRole } : u));
+      showToast(`Đã đổi vai trò của ${user.userName} thành ${nextRole === 'admin' ? 'Quản trị viên' : 'Người dùng'}!`);
+      fetchUsers();
+    } catch (e: any) {
+      alert(e.message || 'Lỗi đổi vai trò');
+      fetchUsers();
     }
   };
 
   // Fast toggle Premium directly via Server API
   const handleTogglePremium = async (user: UserItem) => {
     const nextPremium = !user.isPremium;
-    setUsers(prev => prev.map(u => u.id === user.id ? { ...u, isPremium: nextPremium } : u));
     try {
-      await fetch('/api/admin/users', {
+      const res = await fetch('/api/admin/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -246,24 +242,35 @@ export const AdminUsersView: React.FC<AdminUsersViewProps> = ({ onBack }) => {
           isPremium: nextPremium
         })
       });
-    } catch (e) {
-      console.warn('Lỗi đổi gói qua server API', e);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Lỗi cập nhật gói tài khoản');
+
+      setUsers(prev => prev.map(u => u.id === user.id ? { ...u, isPremium: nextPremium } : u));
+      showToast(`Đã ${nextPremium ? 'bật' : 'hủy'} gói Premium cho ${user.userName}!`);
+      fetchUsers();
+    } catch (e: any) {
+      alert(e.message || 'Lỗi đổi gói');
+      fetchUsers();
     }
   };
 
   // Delete User via Server API
   const handleConfirmDelete = async () => {
     if (!deletingUser) return;
-    setUsers(prev => prev.filter(u => u.id !== deletingUser.id));
     try {
-      await fetch(`/api/admin/users?id=${encodeURIComponent(deletingUser.id)}`, {
+      const res = await fetch(`/api/admin/users?id=${encodeURIComponent(deletingUser.id)}`, {
         method: 'DELETE'
       });
-    } catch (e) {
-      console.warn('Lỗi xoá người dùng qua server API', e);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Lỗi xoá người dùng');
+
+      showToast(`Đã xoá người dùng ${deletingUser.userName}!`);
+      setIsDeleteModalOpen(false);
+      setDeletingUser(null);
+      fetchUsers();
+    } catch (e: any) {
+      alert(e.message || 'Lỗi xoá người dùng qua server API');
     }
-    setIsDeleteModalOpen(false);
-    setDeletingUser(null);
   };
 
   // ==================== 1. ACCESS DENIED SCREEN (IF NOT ADMIN) ====================
@@ -289,6 +296,14 @@ export const AdminUsersView: React.FC<AdminUsersViewProps> = ({ onBack }) => {
   // ==================== 2. MAIN ADMIN USERS MANAGEMENT UI ====================
   return (
     <div className={styles.wrapper}>
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className={styles.toastNotification}>
+          <Check size={18} color="#4ade80" />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
       {/* Header Area */}
       <div className={styles.headerArea}>
         <div className={styles.titleArea}>

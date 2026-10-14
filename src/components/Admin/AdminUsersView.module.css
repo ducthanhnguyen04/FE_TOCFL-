@@ -566,3 +566,34 @@
   gap: 10px;
   margin-top: 24px;
 }
+
+/* Toast Notification */
+.toastNotification {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background-color: var(--text-primary);
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: var(--sketch-radius);
+  border: 2px solid var(--border-sketch);
+  font-weight: 700;
+  font-size: 13.5px;
+  box-shadow: 3px 3px 0px var(--border-sketch);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: slideUp 0.25s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

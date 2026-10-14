@@ -91,37 +91,114 @@ export async function POST(req: NextRequest) {
       if (role !== 'admin' && role !== 'user') {
         return NextResponse.json({ error: 'Vai trò không hợp lệ' }, { status: 400 });
       }
-      const { error } = await supabase
+
+      // 1. Thử gọi RPC admin_update_user_role
+      const { error: rpcError } = await supabase.rpc('admin_update_user_role', {
+        p_user_id: targetUserId,
+        p_role: role
+      });
+
+      if (!rpcError) {
+        return NextResponse.json({ success: true, message: 'Đã cập nhật vai trò' });
+      }
+      console.warn('RPC admin_update_user_role error:', rpcError.message);
+
+      // 2. Fallback update trực tiếp
+      const { data, error } = await supabase
         .from('users')
         .update({ role })
-        .eq('id', targetUserId);
+        .eq('id', targetUserId)
+        .select();
 
       if (error) throw error;
+      if (!data || data.length === 0) {
+        throw new Error('Không thể cập nhật vai trò (0 dòng thay đổi). Vui lòng chạy đoạn mã SQL trong file supabase_admin_security.sql trên Supabase để cấp quyền.');
+      }
       return NextResponse.json({ success: true, message: 'Đã cập nhật vai trò' });
     }
 
     if (action === 'update_premium') {
-      const { error } = await supabase
-        .from('users')
-        .update({ isPremium: Boolean(isPremium) })
-        .eq('id', targetUserId);
+      const isPrem = Boolean(isPremium);
 
-      if (error) throw error;
+      // 1. Thử gọi RPC admin_update_user_premium
+      const { error: rpcError } = await supabase.rpc('admin_update_user_premium', {
+        p_user_id: targetUserId,
+        p_is_premium: isPrem
+      });
+
+      if (!rpcError) {
+        return NextResponse.json({ success: true, message: 'Đã cập nhật trạng thái Premium' });
+      }
+      console.warn('RPC admin_update_user_premium error:', rpcError.message);
+
+      // 2. Fallback update trực tiếp với ispremium (lowercase)
+      let { data, error } = await supabase
+        .from('users')
+        .update({ ispremium: isPrem })
+        .eq('id', targetUserId)
+        .select();
+
+      if (error || !data || data.length === 0) {
+        const retry = await supabase
+          .from('users')
+          .update({ isPremium: isPrem })
+          .eq('id', targetUserId)
+          .select();
+        if (retry.error) throw retry.error;
+        if (!retry.data || retry.data.length === 0) {
+          throw new Error('Không thể cập nhật gói Premium (0 dòng thay đổi). Vui lòng chạy đoạn mã SQL trong file supabase_admin_security.sql trên Supabase.');
+        }
+      }
+
       return NextResponse.json({ success: true, message: 'Đã cập nhật trạng thái Premium' });
     }
 
     if (action === 'update_info') {
-      const { error } = await supabase
+      const isPrem = Boolean(isPremium);
+
+      // 1. Thử gọi RPC admin_update_user
+      const { error: rpcError } = await supabase.rpc('admin_update_user', {
+        p_user_id: targetUserId,
+        p_username: userName,
+        p_email: email,
+        p_role: role,
+        p_is_premium: isPrem
+      });
+
+      if (!rpcError) {
+        return NextResponse.json({ success: true, message: 'Đã cập nhật thông tin người dùng' });
+      }
+      console.warn('RPC admin_update_user error:', rpcError.message);
+
+      // 2. Fallback update trực tiếp
+      let { data, error } = await supabase
         .from('users')
         .update({
-          userName,
+          username: userName,
           email,
           role,
-          isPremium: Boolean(isPremium)
+          ispremium: isPrem
         })
-        .eq('id', targetUserId);
+        .eq('id', targetUserId)
+        .select();
 
-      if (error) throw error;
+      if (error || !data || data.length === 0) {
+        const retry = await supabase
+          .from('users')
+          .update({
+            userName,
+            email,
+            role,
+            isPremium: isPrem
+          })
+          .eq('id', targetUserId)
+          .select();
+        if (retry.error) throw retry.error;
+        if (!retry.data || retry.data.length === 0) {
+          throw new Error('Không thể cập nhật thông tin người dùng (0 dòng thay đổi). Vui lòng chạy đoạn mã SQL trong file supabase_admin_security.sql trên Supabase.');
+        }
+      }
+
       return NextResponse.json({ success: true, message: 'Đã cập nhật thông tin người dùng' });
     }
 
@@ -130,10 +207,10 @@ export async function POST(req: NextRequest) {
         .from('users')
         .insert({
           id: targetUserId || `user-${Date.now()}`,
-          userName,
+          username: userName,
           email,
           role: role || 'user',
-          isPremium: Boolean(isPremium)
+          ispremium: Boolean(isPremium)
         });
 
       if (error) throw error;
@@ -167,12 +244,26 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: 'Không thể tự xoá tài khoản Admin của chính mình!' }, { status: 400 });
     }
 
-    const { error } = await supabase
+    // 1. Thử gọi RPC admin_delete_user
+    const { error: rpcError } = await supabase.rpc('admin_delete_user', {
+      p_user_id: userId
+    });
+
+    if (!rpcError) {
+      return NextResponse.json({ success: true, message: 'Đã xoá người dùng thành công' });
+    }
+
+    // 2. Fallback xoá trực tiếp
+    const { data, error } = await supabase
       .from('users')
       .delete()
-      .eq('id', userId);
+      .eq('id', userId)
+      .select();
 
     if (error) throw error;
+    if (!data || data.length === 0) {
+      throw new Error('Không thể xoá người dùng (0 dòng bị xoá). Vui lòng chạy file supabase_admin_security.sql trên Supabase.');
+    }
     return NextResponse.json({ success: true, message: 'Đã xoá người dùng thành công' });
   } catch (err: any) {
     return NextResponse.json({ error: err.message || 'Lỗi khi xoá người dùng' }, { status: 500 });

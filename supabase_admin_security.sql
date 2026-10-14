@@ -102,15 +102,24 @@ CREATE TRIGGER trigger_check_role_escalation
   EXECUTE FUNCTION public.check_user_update_privileges();
 
 -- 9. POLICY CẬP NHẬT (UPDATE):
-CREATE POLICY "Users can update own profile"
+DROP POLICY IF EXISTS "Users can update own profile" ON public.users;
+DROP POLICY IF EXISTS "Users can update own profile, Admins can update any" ON public.users;
+DROP POLICY IF EXISTS "Admins can update any profile or user update own" ON public.users;
+
+CREATE POLICY "Admins can update any profile or user update own"
 ON public.users
 FOR UPDATE
 TO authenticated
 USING (
   auth.uid() = id OR public.is_admin()
+)
+WITH CHECK (
+  auth.uid() = id OR public.is_admin()
 );
 
 -- 10. POLICY XOÁ (DELETE):
+DROP POLICY IF EXISTS "Only admins can delete users" ON public.users;
+
 CREATE POLICY "Only admins can delete users"
 ON public.users
 FOR DELETE
@@ -118,6 +127,100 @@ TO authenticated
 USING (
   public.is_admin()
 );
+
+-- 11. HÀM RPC ĐỔI VAI TRÒ DÀNH CHO ADMIN (AN TOÀN TUYỆT ĐỐI)
+CREATE OR REPLACE FUNCTION public.admin_update_user_role(p_user_id text, p_role text)
+RETURNS boolean
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  IF NOT public.is_admin() THEN
+    RAISE EXCEPTION 'Truy cập bị từ chối: Chỉ quản trị viên mới có quyền thay đổi vai trò!';
+  END IF;
+
+  UPDATE public.users
+  SET role = p_role
+  WHERE id::text = p_user_id::text;
+
+  RETURN true;
+END;
+$$;
+
+-- 12. HÀM RPC ĐỔI GÓI PREMIUM DÀNH CHO ADMIN
+CREATE OR REPLACE FUNCTION public.admin_update_user_premium(p_user_id text, p_is_premium boolean)
+RETURNS boolean
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  IF NOT public.is_admin() THEN
+    RAISE EXCEPTION 'Truy cập bị từ chối: Chỉ quản trị viên mới có quyền cập nhật gói Premium!';
+  END IF;
+
+  UPDATE public.users
+  SET ispremium = p_is_premium
+  WHERE id::text = p_user_id::text;
+
+  RETURN true;
+END;
+$$;
+
+-- 13. HÀM RPC CẬP NHẬT TOÀN DIỆN THÔNG TIN USER DÀNH CHO ADMIN
+CREATE OR REPLACE FUNCTION public.admin_update_user(
+  p_user_id text,
+  p_username text,
+  p_email text,
+  p_role text,
+  p_is_premium boolean
+)
+RETURNS boolean
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  IF NOT public.is_admin() THEN
+    RAISE EXCEPTION 'Truy cập bị từ chối: Chỉ quản trị viên mới có quyền cập nhật người dùng!';
+  END IF;
+
+  UPDATE public.users
+  SET 
+    username = COALESCE(p_username, username),
+    email = COALESCE(p_email, email),
+    role = COALESCE(p_role, role),
+    ispremium = COALESCE(p_is_premium, ispremium)
+  WHERE id::text = p_user_id::text;
+
+  RETURN true;
+END;
+$$;
+
+-- 14. HÀM RPC XOÁ NGƯỜI DÙNG DÀNH CHO ADMIN
+CREATE OR REPLACE FUNCTION public.admin_delete_user(p_user_id text)
+RETURNS boolean
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  IF NOT public.is_admin() THEN
+    RAISE EXCEPTION 'Truy cập bị từ chối: Chỉ quản trị viên mới có quyền xoá người dùng!';
+  END IF;
+
+  DELETE FROM public.users
+  WHERE id::text = p_user_id::text;
+
+  RETURN true;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.admin_update_user_role(text, text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.admin_update_user_premium(text, boolean) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.admin_update_user(text, text, text, text, boolean) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.admin_delete_user(text) TO authenticated;
 
 -- ==============================================================================
 -- PHẦN 2: BẢO MẬT VÀ PHÂN QUYỀN CHO GIÁO TRÌNH (BOOK_SERIES, BOOKS, LESSONS)
