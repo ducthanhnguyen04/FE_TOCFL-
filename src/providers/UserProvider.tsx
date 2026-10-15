@@ -10,6 +10,7 @@ interface UserContextType {
   user: User | null;
   role: string;
   isAdmin: boolean;
+  isPremium: boolean;
   isLoading: boolean;
   refreshUser: () => Promise<void>;
   logout: () => Promise<void>;
@@ -28,6 +29,7 @@ export const UserProvider = ({
 }) => {
   const [user, setUser] = useState<User | null>(initialUser);
   const [role, setRole] = useState<string>('user');
+  const [isPremium, setIsPremium] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(!initialUser);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const router = useRouter();
@@ -38,48 +40,52 @@ export const UserProvider = ({
   const resolveRole = async (currentUser: User | null) => {
     if (!currentUser) {
       setRole('guest');
+      setIsPremium(false);
       return;
     }
 
-    if (currentUser.user_metadata?.role) {
-      setRole(currentUser.user_metadata.role);
-      return;
-    }
-
-    if (currentUser.app_metadata?.role) {
-      setRole(currentUser.app_metadata.role);
-      return;
-    }
+    let roleFound: string | null = (currentUser.user_metadata?.role || currentUser.app_metadata?.role) as string | null;
+    let premiumFound: boolean = Boolean(
+      currentUser.user_metadata?.isPremium ??
+      currentUser.user_metadata?.ispremium ??
+      currentUser.app_metadata?.isPremium ??
+      currentUser.app_metadata?.ispremium
+    );
 
     try {
       const supabase = createClient();
-      let roleFound: string | null = null;
 
       // 1. Tra cứu theo Auth ID
       const { data, error } = await supabase
         .from('users')
-        .select('role')
+        .select('role, ispremium')
         .eq('id', currentUser.id)
         .maybeSingle();
 
       if (error) {
         console.warn('resolveRole by id error:', error.message);
-      } else if (data?.role) {
-        roleFound = data.role;
+      } else if (data) {
+        if (data.role) roleFound = data.role;
+        if (data.ispremium !== undefined && data.ispremium !== null) {
+          premiumFound = Boolean(data.ispremium);
+        }
       }
 
       // 2. Fallback tra cứu theo email
-      if (!roleFound && currentUser.email) {
+      if ((!roleFound || !premiumFound) && currentUser.email) {
         const { data: emailData, error: emailError } = await supabase
           .from('users')
-          .select('role')
+          .select('role, ispremium')
           .eq('email', currentUser.email)
           .maybeSingle();
 
         if (emailError) {
           console.warn('resolveRole by email error:', emailError.message);
-        } else if (emailData?.role) {
-          roleFound = emailData.role;
+        } else if (emailData) {
+          if (emailData.role) roleFound = emailData.role;
+          if (emailData.ispremium !== undefined && emailData.ispremium !== null) {
+            premiumFound = Boolean(emailData.ispremium);
+          }
         }
       }
 
@@ -90,24 +96,23 @@ export const UserProvider = ({
       if (!roleFound && googleId) {
         const { data: gData } = await supabase
           .from('users')
-          .select('role')
+          .select('role, ispremium')
           .eq('googleid', googleId)
           .maybeSingle();
 
-        if (gData?.role) {
-          roleFound = gData.role;
+        if (gData) {
+          if (gData.role) roleFound = gData.role;
+          if (gData.ispremium !== undefined && gData.ispremium !== null) {
+            premiumFound = Boolean(gData.ispremium);
+          }
         }
-      }
-
-      if (roleFound) {
-        setRole(roleFound);
-        return;
       }
     } catch (e) {
       console.error('resolveRole catch error:', e);
     }
 
-    setRole('user');
+    setRole(roleFound || 'user');
+    setIsPremium(premiumFound);
   };
 
   const refreshUser = async () => {
@@ -123,6 +128,7 @@ export const UserProvider = ({
     await supabase.auth.signOut();
     setUser(null);
     setRole('guest');
+    setIsPremium(false);
     router.refresh();
   };
 
@@ -150,9 +156,22 @@ export const UserProvider = ({
   }, [router]);
 
   const isAdmin = role === 'admin';
+  const hasPremium = isPremium || isAdmin;
 
   return (
-    <UserContext.Provider value={{ user, role, isAdmin, isLoading, refreshUser, logout, openLoginModal, closeLoginModal }}>
+    <UserContext.Provider
+      value={{
+        user,
+        role,
+        isAdmin,
+        isPremium: hasPremium,
+        isLoading,
+        refreshUser,
+        logout,
+        openLoginModal,
+        closeLoginModal,
+      }}
+    >
       {children}
       <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} />
     </UserContext.Provider>

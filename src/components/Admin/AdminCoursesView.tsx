@@ -627,6 +627,15 @@ export const AdminCoursesView: React.FC<AdminCoursesViewProps> = ({ onBack, onNa
                                 <button
                                   type="button"
                                   className={styles.iconBtn}
+                                  style={{ color: '#2b7fd4' }}
+                                  onClick={() => onNavigateToLessons?.(b.id)}
+                                  title="Quản lý danh sách bài học của cuốn sách này"
+                                >
+                                  <FolderKanban size={14} />
+                                </button>
+                                <button
+                                  type="button"
+                                  className={styles.iconBtn}
                                   onClick={() => handleOpenBookModal(b.bookSeriId, b)}
                                   title="Đổi tên hoặc đổi bộ cho cuốn sách"
                                 >
@@ -782,6 +791,16 @@ export const AdminCoursesView: React.FC<AdminCoursesViewProps> = ({ onBack, onNa
                                     </div>
 
                                     <div className={styles.bookActions}>
+                                      <button
+                                        type="button"
+                                        className={styles.iconBtn}
+                                        style={{ color: '#2b7fd4' }}
+                                        onClick={() => onNavigateToLessons?.(book.id)}
+                                        title="Quản lý các bài học của cuốn sách này"
+                                      >
+                                        <FolderKanban size={14} />
+                                      </button>
+
                                       <button
                                         type="button"
                                         className={styles.iconBtn}

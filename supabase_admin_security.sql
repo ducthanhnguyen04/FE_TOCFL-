@@ -296,3 +296,109 @@ CREATE POLICY "Admins can delete lessons"
 ON public.lessons FOR DELETE TO authenticated
 USING (public.is_admin());
 
+-- 6. CÁC HÀM RPC ĐẶC QUYỀN ADMIN CHO LESSONS (AN TOÀN TUYỆT ĐỐI)
+CREATE OR REPLACE FUNCTION public.admin_create_lesson(
+  p_lesson_name text,
+  p_book_id uuid,
+  p_is_locked boolean
+)
+RETURNS json
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_new_lesson json;
+BEGIN
+  IF NOT public.is_admin() THEN
+    RAISE EXCEPTION 'Truy cập bị từ chối: Chỉ quản trị viên mới có quyền tạo bài học!';
+  END IF;
+
+  INSERT INTO public.lessons ("lessonName", "bookId", "isLocked", "wordCount")
+  VALUES (p_lesson_name, p_book_id, COALESCE(p_is_locked, false), 0)
+  RETURNING row_to_json(public.lessons.*) INTO v_new_lesson;
+
+  RETURN v_new_lesson;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.admin_update_lesson(
+  p_lesson_id uuid,
+  p_lesson_name text,
+  p_book_id uuid,
+  p_is_locked boolean
+)
+RETURNS json
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_updated_lesson json;
+BEGIN
+  IF NOT public.is_admin() THEN
+    RAISE EXCEPTION 'Truy cập bị từ chối: Chỉ quản trị viên mới có quyền sửa bài học!';
+  END IF;
+
+  UPDATE public.lessons
+  SET 
+    "lessonName" = p_lesson_name,
+    "bookId" = p_book_id,
+    "isLocked" = COALESCE(p_is_locked, "isLocked"),
+    "updatedAt" = NOW()
+  WHERE id = p_lesson_id
+  RETURNING row_to_json(public.lessons.*) INTO v_updated_lesson;
+
+  RETURN v_updated_lesson;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.admin_toggle_lesson_lock(
+  p_lesson_id uuid,
+  p_is_locked boolean
+)
+RETURNS boolean
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  IF NOT public.is_admin() THEN
+    RAISE EXCEPTION 'Truy cập bị từ chối: Chỉ quản trị viên mới có quyền đổi trạng thái bài học!';
+  END IF;
+
+  UPDATE public.lessons
+  SET 
+    "isLocked" = p_is_locked,
+    "updatedAt" = NOW()
+  WHERE id = p_lesson_id;
+
+  RETURN true;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.admin_delete_lesson(
+  p_lesson_id uuid
+)
+RETURNS boolean
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  IF NOT public.is_admin() THEN
+    RAISE EXCEPTION 'Truy cập bị từ chối: Chỉ quản trị viên mới có quyền xóa bài học!';
+  END IF;
+
+  DELETE FROM public.lessons
+  WHERE id = p_lesson_id;
+
+  RETURN true;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.admin_create_lesson(text, uuid, boolean) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.admin_update_lesson(uuid, text, uuid, boolean) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.admin_toggle_lesson_lock(uuid, boolean) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.admin_delete_lesson(uuid) TO authenticated;
+

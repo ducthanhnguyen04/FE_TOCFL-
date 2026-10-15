@@ -20,7 +20,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ item, onBack }) => {
   const router = useRouter();
   const params = useParams();
   const { t } = useLanguage();
-  const { user, openLoginModal } = useUser();
+  const { user, isPremium, isAdmin, openLoginModal } = useUser();
   const [dbLessons, setDbLessons] = useState<any[]>([]);
 
   useEffect(() => {
@@ -52,6 +52,11 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ item, onBack }) => {
   const handleLessonSelect = (lessonId: string | number) => {
     if (!user) {
       openLoginModal();
+      return;
+    }
+    const targetLesson = dbLessons.find(l => l.id === lessonId);
+    if (targetLesson?.isLocked && !isPremium && !isAdmin) {
+      alert('⭐ Bài học này chỉ dành riêng cho tài khoản VIP Premium. Vui lòng liên hệ Admin để nâng cấp gói tài khoản!');
       return;
     }
     router.push(`/course/${params.id}/lesson/${lessonId}`);

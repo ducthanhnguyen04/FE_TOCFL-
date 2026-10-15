@@ -22,7 +22,7 @@ import { createClient } from '@/lib/supabase/client';
 
 export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, customVocabs, customTitle, onBack }) => {
   const { lang, t } = useLanguage();
-  const { user, isLoading: isUserLoading, openLoginModal } = useUser();
+  const { user, isPremium, isAdmin, isLoading: isUserLoading, openLoginModal } = useUser();
   
   const studyModes = [
     { id: 'flashcard', title: t('lesson.vocab'), status: t('lesson.unstudied') },
@@ -44,6 +44,7 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
   const autoPlayRef = React.useRef<boolean>(false);
   const audioRef = React.useRef<HTMLAudioElement | null>(null);
   const [lessonName, setLessonName] = useState(customTitle || t('lesson.loading'));
+  const [isLockedLesson, setIsLockedLesson] = useState<boolean>(false);
 
   React.useEffect(() => {
     if (customVocabs) {
@@ -64,7 +65,13 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
         .eq('id', lessonId)
         .single();
         
-      if (lessonData) setLessonName(lessonData.lessonName);
+      if (lessonData) {
+        setLessonName(lessonData.lessonName);
+        if (lessonData.isLocked && !isPremium && !isAdmin) {
+          setIsLockedLesson(true);
+          return;
+        }
+      }
       
       const { data: vocabData, error } = await supabase
         .from('vocabularies')
@@ -276,6 +283,35 @@ export const LessonDetail: React.FC<LessonDetailProps> = ({ courseId, lessonId, 
               style={{ padding: '10px 24px', borderRadius: 8, border: '2px solid var(--border-sketch)', background: 'var(--text-primary)', color: '#ffffff', fontWeight: 800, cursor: 'pointer' }}
             >
               {t('login.loginNow')}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLockedLesson && !isUserLoading && !isPremium && !isAdmin) {
+    return (
+      <div className={styles.lessonWrapper} style={{ animation: 'fadeIn 0.3s ease', textAlign: 'center', padding: '60px 20px' }}>
+        <div className="sketch-box" style={{ maxWidth: 480, margin: '0 auto', padding: '40px 24px', backgroundColor: 'var(--bg-paper)', borderRadius: 'var(--sketch-radius)', border: '2px solid var(--border-sketch)' }}>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>⭐</div>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, backgroundColor: '#fef3c7', color: '#92400e', border: '1.5px solid #d97706', borderRadius: 6, padding: '4px 12px', fontSize: 12, fontWeight: 800, marginBottom: 14 }}>
+            <span>NỘI DUNG VIP PREMIUM</span>
+          </div>
+          <h2 style={{ fontSize: 22, fontWeight: 800, marginBottom: 8, color: 'var(--text-primary)' }}>
+            {lessonName || 'Bài Học Premium'}
+          </h2>
+          <p style={{ fontSize: 15, color: 'var(--text-secondary)', marginBottom: 24, lineHeight: 1.5 }}>
+            Bài học này đã được khóa và chỉ dành riêng cho tài khoản <strong>VIP Premium</strong>.
+            Tài khoản hiện tại của bạn chưa được kích hoạt gói Premium để truy cập nội dung này.
+          </p>
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+            <button 
+              onClick={onBack}
+              className="sketch-cross"
+              style={{ padding: '10px 20px', borderRadius: 8, border: '1.5px solid var(--border-sketch)', background: 'transparent', fontWeight: 700, cursor: 'pointer' }}
+            >
+              {t('common.back') || 'Quay lại'}
             </button>
           </div>
         </div>

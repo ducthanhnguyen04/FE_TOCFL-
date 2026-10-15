@@ -23,6 +23,7 @@ import {
   RoleplayView,
   AdminUsersView,
   AdminCoursesView,
+  AdminLessonsView,
 } from '@/components';
 import { TOCFLLevelItem, MenuItem } from '@/types';
 import { TOCFL_LEVELS } from '@/data/tocflData';
@@ -98,7 +99,8 @@ export default function ClientPage({ courseId, lessonId, initialActiveMenuId = '
       'roleplay': '/roleplay',
       'admin': '/admin/users',
       'admin-users': '/admin/users',
-      'admin-courses': '/admin/courses'
+      'admin-courses': '/admin/courses',
+      'admin-lessons': '/admin/lessons'
     };
 
     if (routeMapping[item.id]) {
@@ -196,7 +198,14 @@ export default function ClientPage({ courseId, lessonId, initialActiveMenuId = '
             ) : (activeMenuId === 'admin-users' || activeMenuId === 'admin') ? (
               <AdminUsersView onBack={() => setActiveMenuId('home')} />
             ) : activeMenuId === 'admin-courses' ? (
-              <AdminCoursesView onBack={() => setActiveMenuId('home')} />
+              <AdminCoursesView
+                onBack={() => setActiveMenuId('home')}
+                onNavigateToLessons={(bookId) => {
+                  router.push(`/admin/lessons${bookId ? `?bookId=${encodeURIComponent(bookId)}` : ''}`);
+                }}
+              />
+            ) : activeMenuId === 'admin-lessons' ? (
+              <AdminLessonsView onBack={() => setActiveMenuId('home')} />
             ) : (
               <>
                 {/* Hero Greeting Section */}

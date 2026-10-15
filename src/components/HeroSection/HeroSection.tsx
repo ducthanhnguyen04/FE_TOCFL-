@@ -5,18 +5,91 @@ import { useUser } from '@/providers/UserProvider';
 import { useLanguage } from '@/providers/LanguageProvider';
 import styles from './HeroSection.module.css';
 
+export interface SocialLinksConfig {
+  facebook?: string;
+  instagram?: string;
+  line?: string;
+}
+
 interface HeroSectionProps {
   onLearnMore?: () => void;
   onJoinCommunity?: () => void;
+  socialLinks?: SocialLinksConfig;
 }
+
+const DEFAULT_SOCIALS: SocialLinksConfig = {
+  facebook: 'https://www.facebook.com/nguyen.duc.thanh.0810',
+  instagram: 'https://www.instagram.com/_thahnd_/',
+  line: 'https://line.me/ti/p/JhHWg2jK9M',
+};
 
 export const HeroSection: React.FC<HeroSectionProps> = ({
   onLearnMore,
   onJoinCommunity,
+  socialLinks = DEFAULT_SOCIALS,
 }) => {
   const { user } = useUser();
   const { t } = useLanguage();
   const displayName = user?.user_metadata?.full_name || t('hero.defaultName');
+
+  const links = { ...DEFAULT_SOCIALS, ...socialLinks };
+
+  const socialItems = [
+    {
+      key: 'facebookBtn',
+      name: 'Facebook',
+      url: links.facebook,
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="12" cy="12" r="12" fill="#1877F2" />
+          <path
+            d="M15.117 12.723l.432-2.817h-2.703V8.077c0-.77.378-1.522 1.587-1.522h1.229V4.156S14.548 4 13.488 4c-2.213 0-3.659 1.341-3.659 3.768v2.138H7.357v2.817h2.472V19.64A12.07 12.07 0 0012 20c.734 0 1.446-.065 2.135-.19v-7.087h2.093z"
+            fill="#ffffff"
+          />
+        </svg>
+      ),
+    },
+    {
+      key: 'instagramBtn',
+      name: 'Instagram',
+      url: links.instagram,
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="igGradHero" x1="0%" y1="100%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#fdf497" />
+              <stop offset="5%" stopColor="#fdf497" />
+              <stop offset="45%" stopColor="#fd5949" />
+              <stop offset="60%" stopColor="#d6249f" />
+              <stop offset="90%" stopColor="#285AEB" />
+            </linearGradient>
+          </defs>
+          <rect width="24" height="24" rx="6" fill="url(#igGradHero)" />
+          <rect x="5.5" y="5.5" width="13" height="13" rx="3.5" stroke="#ffffff" strokeWidth="1.6" fill="none" />
+          <circle cx="12" cy="12" r="3.2" stroke="#ffffff" strokeWidth="1.6" fill="none" />
+          <circle cx="15.8" cy="8.2" r="0.9" fill="#ffffff" />
+        </svg>
+      ),
+    },
+    {
+      key: 'lineBtn',
+      name: 'LINE',
+      url: links.line,
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <rect width="24" height="24" rx="6" fill="#06C755" />
+          <path
+            d="M19.36 10.04c0-3.87-3.95-7.04-8.8-7.04-4.86 0-8.8 3.17-8.8 7.04 0 3.47 3.07 6.38 7.22 6.92.28.06.66.19.76.44.09.22.06.57.03.8l-.13.77c-.04.23-.18.9.79.49.95-.4 5.14-3.03 7.01-5.18 1.38-1.55 1.92-2.96 1.92-4.24z"
+            fill="#ffffff"
+          />
+          <path
+            d="M7.74 11.53H6.38a.38.38 0 01-.38-.38V8.92c0-.21.17-.38.38-.38.21 0 .38.17.38.38v1.85h.98c.21 0 .38.17.38.38 0 .21-.17.38-.38.38zm1.96 0a.38.38 0 01-.38-.38V8.92c0-.21.17-.38.38-.38.21 0 .38.17.38.38v2.23a.38.38 0 01-.38.38zm3.28 0a.38.38 0 01-.35-.23l-1.35-1.92v1.77a.38.38 0 01-.38.38.38.38 0 01-.38-.38V8.92a.38.38 0 01.69-.22l1.35 1.92V8.92c0-.21.17-.38.38-.38.21 0 .38.17.38.38v2.23a.38.38 0 01-.34.38zm2.74-.38a.38.38 0 01.38.38.38.38 0 01-.38.38h-1.36a.38.38 0 01-.38-.38V8.92c0-.21.17-.38.38-.38h1.36a.38.38 0 010 .76h-.98v.35h.85a.38.38 0 010 .76h-.85v.36h.98z"
+            fill="#06C755"
+          />
+        </svg>
+      ),
+    },
+  ];
 
   return (
     <section className={styles.heroSection}>
@@ -67,22 +140,28 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         <p>
           {t('hero.intro')}
         </p>
-
       </div>
 
-      {/* Community group invite */}
-      <div className={styles.communityRow}>
-        <span className={styles.communityLabel}>
-          {t('hero.joinCommunity')}
+      {/* Social networks list */}
+      <div className={styles.socialRow}>
+        <span className={styles.socialLabel}>
+          {t('hero.socialLabel') || 'Mạng xã hội của mình:'}
         </span>
-        <button
-          type="button"
-          className={styles.communityBtn}
-          onClick={onJoinCommunity}
-        >
-          <span className={styles.pinIcon}>🎈</span>
-          <span>{t('hero.communityName')}</span>
-        </button>
+        <div className={styles.socialList}>
+          {socialItems.map((item) => (
+            <a
+              key={item.name}
+              href={item.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${styles.socialBtn} ${styles[item.key]}`}
+              title={`Theo dõi qua ${item.name}`}
+            >
+              <span className={styles.socialIconWrap}>{item.icon}</span>
+              <span>{item.name}</span>
+            </a>
+          ))}
+        </div>
       </div>
     </section>
   );

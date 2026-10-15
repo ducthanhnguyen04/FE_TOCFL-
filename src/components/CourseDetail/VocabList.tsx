@@ -1,6 +1,7 @@
 import React from 'react';
-import { ChevronRight, Lock } from 'lucide-react';
+import { ChevronRight, Lock, Star, Unlock } from 'lucide-react';
 import { useLanguage } from '@/providers/LanguageProvider';
+import { useUser } from '@/providers/UserProvider';
 import styles from './CourseDetail.module.css';
 
 interface LessonItem {
@@ -18,6 +19,21 @@ interface VocabListProps {
 
 export const VocabList: React.FC<VocabListProps> = ({ lessons, onSelect }) => {
   const { t } = useLanguage();
+  const { user, isPremium, isAdmin, openLoginModal } = useUser();
+
+  const handleItemClick = (lesson: LessonItem) => {
+    const isAccessible = !lesson.isLocked || isPremium || isAdmin;
+    if (!isAccessible) {
+      if (!user) {
+        openLoginModal();
+        return;
+      }
+      alert('⭐ Bài học này dành riêng cho tài khoản VIP Premium. Vui lòng liên hệ Admin hoặc nâng cấp tài khoản để truy cập!');
+      return;
+    }
+    onSelect?.(lesson.id);
+  };
+
   return (
     <div className={styles.lessonsList}>
       {lessons.length === 0 ? (
@@ -25,27 +41,40 @@ export const VocabList: React.FC<VocabListProps> = ({ lessons, onSelect }) => {
           {t('course.emptyLesson')}
         </div>
       ) : (
-        lessons.map((lesson) => (
-          <button
-            key={lesson.id}
-            className={`${styles.lessonCard} sketch-cross ${lesson.isLocked ? styles.lessonLocked : ''}`}
-            onClick={() => !lesson.isLocked && onSelect?.(lesson.id)}
-          >
-            <div className={`${styles.lessonNumber} sketch-cross`}>{lesson.displayId || lesson.id}</div>
-            <div className={styles.lessonInfo}>
-              <h4 className={styles.lessonTitle}>{lesson.title}</h4>
-              <p className={styles.lessonDesc}>{lesson.vocabCount} {t('course.vocabUnit')}</p>
-            </div>
-            <div className={styles.lessonAction}>
-              {lesson.isLocked ? (
-                <Lock size={18} color="#888" />
-              ) : (
-                <ChevronRight size={20} color="#222" />
-              )}
-            </div>
-          </button>
-        ))
+        lessons.map((lesson) => {
+          const isAccessible = !lesson.isLocked || isPremium || isAdmin;
+
+          return (
+            <button
+              key={lesson.id}
+              className={`${styles.lessonCard} sketch-cross ${lesson.isLocked && !isAccessible ? styles.lessonLocked : ''}`}
+              onClick={() => handleItemClick(lesson)}
+            >
+              <div className={`${styles.lessonNumber} sketch-cross`}>{lesson.displayId || lesson.id}</div>
+              <div className={styles.lessonInfo}>
+                <h4 className={styles.lessonTitle}>{lesson.title}</h4>
+                <p className={styles.lessonDesc}>{lesson.vocabCount} {t('course.vocabUnit')}</p>
+              </div>
+              <div className={styles.lessonAction}>
+                {lesson.isLocked ? (
+                  <div className={`${styles.premiumBadge} ${isAccessible ? styles.premiumUnlocked : ''}`}>
+                    <Star size={12} fill="#d97706" color="#d97706" />
+                    <span>Premium</span>
+                    {isAccessible ? (
+                      <Unlock size={12} color="#059669" />
+                    ) : (
+                      <Lock size={12} color="#92400e" />
+                    )}
+                  </div>
+                ) : (
+                  <ChevronRight size={20} color="#222" />
+                )}
+              </div>
+            </button>
+          );
+        })
       )}
     </div>
   );
 };
+
