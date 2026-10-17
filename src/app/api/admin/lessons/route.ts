@@ -221,6 +221,110 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: true, isLocked: nextLockState });
     }
 
+    // D. Nhập hàng loạt bài học (Bulk create lessons)
+    if (action === 'bulk_create') {
+      const { lessons: bulkList, defaultBookId } = body;
+
+      if (!Array.isArray(bulkList) || bulkList.length === 0) {
+        return NextResponse.json({ error: 'Dữ liệu nhập vào phải là một mảng JSON các bài học (không được để trống)' }, { status: 400 });
+      }
+
+      // Chuẩn hóa và kiểm tra dữ liệu từng bài học
+      const preparedLessons = [];
+      for (let i = 0; i < bulkList.length; i++) {
+        const item = bulkList[i];
+        const name = (item.lessonName || item.name || item.title || '').trim();
+        const bId = item.bookId || defaultBookId;
+
+        if (!name) {
+          return NextResponse.json({ error: `Bài học ở vị trí #${i + 1} thiếu tên (lessonName)` }, { status: 400 });
+        }
+        if (!bId) {
+          return NextResponse.json({ error: `Bài học "${name}" chưa được chọn cuốn sách (bookId)` }, { status: 400 });
+        }
+
+        preparedLessons.push({
+          lessonName: name,
+          bookId: bId,
+          wordCount: Number(item.wordCount || item.vocabCount || (Array.isArray(item.vocabularies) ? item.vocabularies.length : 0)) || 0,
+          isLocked: Boolean(item.isLocked ?? item.locked ?? item.isPremium ?? false),
+          rawVocabs: Array.isArray(item.vocabularies) ? item.vocabularies : null
+        });
+      }
+
+      // Payload chèn bài học
+      const rpcPayload = preparedLessons.map(l => ({
+        lessonName: l.lessonName,
+        bookId: l.bookId,
+        isLocked: l.isLocked,
+        wordCount: l.wordCount
+      }));
+
+      // 1. Thử gọi RPC admin_bulk_create_lessons
+      const { data: rpcData, error: rpcError } = await supabase.rpc('admin_bulk_create_lessons', {
+        p_lessons: rpcPayload
+      });
+
+      let insertedRows = rpcData;
+
+      // 2. Fallback chèn trực tiếp
+      if (rpcError || !insertedRows) {
+        const { data: directData, error: directError } = await supabase
+          .from('lessons')
+          .insert(rpcPayload)
+          .select('id, lessonName, bookId');
+
+        if (directError) throw directError;
+        insertedRows = directData;
+      }
+
+      // 3. Nếu có từ vựng đi kèm trong JSON, chèn tiếp vào bảng vocabularies
+      let insertedVocabCount = 0;
+      if (Array.isArray(insertedRows) && insertedRows.length > 0) {
+        const vocabRowsToInsert = [];
+
+        for (let i = 0; i < preparedLessons.length; i++) {
+          const prep = preparedLessons[i];
+          const inserted = insertedRows[i];
+
+          if (inserted && prep.rawVocabs && prep.rawVocabs.length > 0) {
+            for (const v of prep.rawVocabs) {
+              const vocabText = (v.vocabulary || v.word || v.hanzi || '').trim();
+              if (vocabText) {
+                vocabRowsToInsert.push({
+                  lessonId: inserted.id,
+                  vocabulary: vocabText,
+                  pinyin: (v.pinyin || '').trim(),
+                  vietnameseMeaning: (v.vietnameseMeaning || v.meaning || v.vietnamMeaning || '').trim(),
+                  englishMeaning: (v.englishMeaning || '').trim(),
+                  indonesiaMeaning: (v.indonesiaMeaning || null)
+                });
+              }
+            }
+          }
+        }
+
+        if (vocabRowsToInsert.length > 0) {
+          const { data: vData, error: vError } = await supabase
+            .from('vocabularies')
+            .insert(vocabRowsToInsert)
+            .select('id');
+
+          if (!vError && vData) {
+            insertedVocabCount = vData.length;
+          }
+        }
+      }
+
+      const totalCount = Array.isArray(insertedRows) ? insertedRows.length : preparedLessons.length;
+      return NextResponse.json({
+        success: true,
+        count: totalCount,
+        vocabCount: insertedVocabCount,
+        message: `Đã nhập thành công ${totalCount} bài học${insertedVocabCount > 0 ? ` và ${insertedVocabCount} từ vựng` : ''} vào database!`
+      });
+    }
+
     return NextResponse.json({ error: 'Hành động không hợp lệ' }, { status: 400 });
   } catch (err: any) {
     return NextResponse.json({ error: err.message || 'Lỗi xử lý server' }, { status: 500 });

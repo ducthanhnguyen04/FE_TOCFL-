@@ -397,8 +397,189 @@ BEGIN
 END;
 $$;
 
+CREATE OR REPLACE FUNCTION public.admin_bulk_create_lessons(
+  p_lessons jsonb
+)
+RETURNS SETOF public.lessons
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_item jsonb;
+  v_new_lesson public.lessons;
+BEGIN
+  IF NOT public.is_admin() THEN
+    RAISE EXCEPTION 'Truy cập bị từ chối: Chỉ quản trị viên mới có quyền nhập hàng loạt bài học!';
+  END IF;
+
+  FOR v_item IN SELECT * FROM jsonb_array_elements(p_lessons)
+  LOOP
+    INSERT INTO public.lessons ("lessonName", "bookId", "isLocked", "wordCount", "createdAt", "updatedAt")
+    VALUES (
+      (v_item->>'lessonName')::text,
+      (v_item->>'bookId')::uuid,
+      COALESCE((v_item->>'isLocked')::boolean, false),
+      COALESCE((v_item->>'wordCount')::integer, 0),
+      NOW(),
+      NOW()
+    )
+    RETURNING * INTO v_new_lesson;
+
+    RETURN NEXT v_new_lesson;
+  END LOOP;
+
+  RETURN;
+END;
+$$;
+
 GRANT EXECUTE ON FUNCTION public.admin_create_lesson(text, uuid, boolean) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.admin_update_lesson(uuid, text, uuid, boolean) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.admin_toggle_lesson_lock(uuid, boolean) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.admin_delete_lesson(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.admin_bulk_create_lessons(jsonb) TO authenticated;
+
+-- ==============================================================================
+-- 10. PHÂN QUYỀN VÀ BẢO MẬT BẢNG VOCABULARIES (TỪ VỰNG)
+-- ==============================================================================
+GRANT ALL ON TABLE public.vocabularies TO anon, authenticated, service_role;
+ALTER TABLE public.vocabularies ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public vocabularies are viewable by everyone" ON public.vocabularies;
+DROP POLICY IF EXISTS "Admins have full access to vocabularies" ON public.vocabularies;
+
+CREATE POLICY "Public vocabularies are viewable by everyone"
+ON public.vocabularies
+FOR SELECT
+TO anon, authenticated
+USING (true);
+
+CREATE POLICY "Admins have full access to vocabularies"
+ON public.vocabularies
+FOR ALL
+TO authenticated
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
+
+-- RPC Nhập hàng loạt từ vựng (Bulk Create Vocabularies)
+CREATE OR REPLACE FUNCTION public.admin_bulk_create_vocabularies(
+  p_vocabularies jsonb
+)
+RETURNS SETOF public.vocabularies
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_item jsonb;
+  v_new_vocab public.vocabularies;
+  v_ex jsonb;
+BEGIN
+  IF NOT public.is_admin() THEN
+    RAISE EXCEPTION 'Truy cập bị từ chối: Chỉ quản trị viên mới có quyền nhập từ vựng!';
+  END IF;
+
+  FOR v_item IN SELECT * FROM jsonb_array_elements(p_vocabularies)
+  LOOP
+    INSERT INTO public.vocabularies (
+      "lessonId",
+      "vocabulary",
+      "pinyin",
+      "vietnameseMeaning",
+      "englishMeaning",
+      "indonesiaMeaning",
+      "createdAt",
+      "updatedAt"
+    )
+    VALUES (
+      (v_item->>'lessonId')::uuid,
+      (v_item->>'vocabulary')::text,
+      COALESCE((v_item->>'pinyin')::text, ''),
+      COALESCE((v_item->>'vietnameseMeaning')::text, ''),
+      COALESCE((v_item->>'englishMeaning')::text, ''),
+      (v_item->>'indonesiaMeaning')::text,
+      NOW(),
+      NOW()
+    )
+    RETURNING * INTO v_new_vocab;
+
+    -- Nếu có mảng câu ví dụ đi kèm (examples), chèn luôn vào bảng public.examples
+    IF v_item ? 'examples' AND jsonb_typeof(v_item->'examples') = 'array' THEN
+      FOR v_ex IN SELECT * FROM jsonb_array_elements(v_item->'examples')
+      LOOP
+        BEGIN
+          -- Ưu tiên cột vocabularyid (chuẩn lowercase trên Supabase)
+          INSERT INTO public.examples (
+            vocabularyid,
+            example,
+            pinyin,
+            vietnammeaning,
+            englishmeaning,
+            indonesiameaning,
+            createdat,
+            updatedat
+          )
+          VALUES (
+            v_new_vocab.id,
+            (v_ex->>'example')::text,
+            COALESCE((v_ex->>'pinyin')::text, ''),
+            COALESCE((v_ex->>'vietnammeaning')::text, COALESCE((v_ex->>'vietnameseMeaning')::text, '')),
+            COALESCE((v_ex->>'englishmeaning')::text, COALESCE((v_ex->>'englishMeaning')::text, '')),
+            COALESCE((v_ex->>'indonesiameaning')::text, (v_ex->>'indonesiaMeaning')::text),
+            NOW(),
+            NOW()
+          );
+        EXCEPTION WHEN undefined_column THEN
+          -- Dự phòng nếu schema được đặt tên là "vocabularyId"
+          INSERT INTO public.examples (
+            "vocabularyId",
+            example,
+            pinyin,
+            vietnammeaning,
+            englishmeaning,
+            indonesiameaning
+          )
+          VALUES (
+            v_new_vocab.id,
+            (v_ex->>'example')::text,
+            COALESCE((v_ex->>'pinyin')::text, ''),
+            COALESCE((v_ex->>'vietnammeaning')::text, COALESCE((v_ex->>'vietnameseMeaning')::text, '')),
+            COALESCE((v_ex->>'englishmeaning')::text, COALESCE((v_ex->>'englishMeaning')::text, '')),
+            COALESCE((v_ex->>'indonesiameaning')::text, (v_ex->>'indonesiaMeaning')::text)
+          );
+        END;
+      END LOOP;
+    END IF;
+
+    RETURN NEXT v_new_vocab;
+  END LOOP;
+
+  RETURN;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.admin_bulk_create_vocabularies(jsonb) TO authenticated;
+
+-- ==============================================================================
+-- 11. PHÂN QUYỀN VÀ BẢO MẬT BẢNG EXAMPLES (CÂU VÍ DỤ TỪ VỰNG)
+-- ==============================================================================
+GRANT ALL ON TABLE public.examples TO anon, authenticated, service_role;
+ALTER TABLE public.examples ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public examples are viewable by everyone" ON public.examples;
+DROP POLICY IF EXISTS "Admins have full access to examples" ON public.examples;
+
+CREATE POLICY "Public examples are viewable by everyone"
+ON public.examples
+FOR SELECT
+TO anon, authenticated
+USING (true);
+
+CREATE POLICY "Admins have full access to examples"
+ON public.examples
+FOR ALL
+TO authenticated
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
+
 

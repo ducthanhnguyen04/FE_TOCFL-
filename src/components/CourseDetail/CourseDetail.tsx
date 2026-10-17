@@ -33,13 +33,31 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ item, onBack }) => {
         .order('createdAt', { ascending: true });
       
       if (data) {
-        const mappedLessons = data.map((d, index) => ({
-          id: d.id,
-          displayId: index + 1,
-          title: d.lessonName,
-          vocabCount: d.wordCount || 0,
-          isLocked: d.isLocked || false
-        }));
+        // Hàm trích xuất số bài học (Ví dụ: "Bài 1 - Tân đồng học" -> 1, "Bài 16" -> 16)
+        const extractLessonNum = (name: string) => {
+          if (!name) return 999999;
+          const match = name.match(/(?:bài|lesson|chương|unit|đoạn|phần|tiết|第)\s*(\d+)/i) || name.match(/\d+/);
+          return match ? parseInt(match[1] || match[0], 10) : 999999;
+        };
+
+        // Sắp xếp tự nhiên theo thứ tự bài học (Bài 1 -> Bài 2 -> ... -> Bài 16)
+        const sortedData = [...data].sort((a, b) => {
+          const numA = extractLessonNum(a.lessonName);
+          const numB = extractLessonNum(b.lessonName);
+          if (numA !== numB) return numA - numB;
+          return (a.lessonName || '').localeCompare(b.lessonName || '', undefined, { numeric: true, sensitivity: 'base' });
+        });
+
+        const mappedLessons = sortedData.map((d, index) => {
+          const num = extractLessonNum(d.lessonName);
+          return {
+            id: d.id,
+            displayId: num !== 999999 ? num : index + 1,
+            title: d.lessonName,
+            vocabCount: d.wordCount || 0,
+            isLocked: d.isLocked || false
+          };
+        });
         setDbLessons(mappedLessons);
       }
     };

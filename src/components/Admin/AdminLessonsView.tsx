@@ -18,7 +18,11 @@ import {
   ShieldCheck,
   BookA,
   Sparkles,
-  ExternalLink
+  ExternalLink,
+  FileJson,
+  AlertCircle,
+  CheckCircle2,
+  Code2
 } from 'lucide-react';
 import styles from './AdminLessonsView.module.css';
 import { useUser } from '@/providers/UserProvider';
@@ -104,6 +108,13 @@ export const AdminLessonsView: React.FC<AdminLessonsViewProps> = ({
   const [deletingLesson, setDeletingLesson] = useState<LessonItem | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
 
+  // Modal: Bulk Import Lessons
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
+  const [bulkDefaultBookId, setBulkDefaultBookId] = useState('');
+  const [bulkJsonInput, setBulkJsonInput] = useState('');
+  const [bulkParseError, setBulkParseError] = useState<string | null>(null);
+  const [parsedBulkLessons, setParsedBulkLessons] = useState<any[]>([]);
+
   // Fetch Lessons and dropdown data from Server API
   const fetchLessonsData = async () => {
     setLoading(true);
@@ -186,6 +197,16 @@ export const AdminLessonsView: React.FC<AdminLessonsViewProps> = ({
         (selectedLockFilter === 'locked' && lesson.isLocked);
 
       return matchSearch && matchSeries && matchBook && matchLock;
+    }).sort((a, b) => {
+      const parseNum = (name: string) => {
+        if (!name) return 999999;
+        const m = name.match(/(?:bài|lesson|chương|unit|đoạn|phần|tiết|第)\s*(\d+)/i) || name.match(/\d+/);
+        return m ? parseInt(m[1] || m[0], 10) : 999999;
+      };
+      const numA = parseNum(a.lessonName);
+      const numB = parseNum(b.lessonName);
+      if (numA !== numB) return numA - numB;
+      return a.lessonName.localeCompare(b.lessonName, undefined, { numeric: true, sensitivity: 'base' });
     });
   }, [lessons, searchQuery, selectedSeriesId, selectedBookId, selectedLockFilter]);
 
@@ -328,6 +349,141 @@ export const AdminLessonsView: React.FC<AdminLessonsViewProps> = ({
     }
   };
 
+  // Bulk Import Handlers
+  const SAMPLE_BULK_JSON = JSON.stringify(
+    [
+      {
+        lessonName: "Bài 1: Giới thiệu bản thân & Chào hỏi",
+        isLocked: false,
+        wordCount: 20
+      },
+      {
+        lessonName: "Bài 2: Mua sắm & Giá cả trong sinh hoạt",
+        isLocked: false,
+        wordCount: 25
+      },
+      {
+        lessonName: "Bài 3: Đặt bàn ăn tại nhà hàng (VIP)",
+        isLocked: true,
+        wordCount: 30
+      }
+    ],
+    null,
+    2
+  );
+
+  const handleOpenBulkModal = () => {
+    const defaultBook =
+      selectedBookId !== 'all' ? selectedBookId : books[0]?.id || '';
+    setBulkDefaultBookId(defaultBook);
+    setBulkParseError(null);
+    if (!bulkJsonInput.trim()) {
+      setBulkJsonInput(SAMPLE_BULK_JSON);
+      try {
+        setParsedBulkLessons(JSON.parse(SAMPLE_BULK_JSON));
+      } catch {
+        setParsedBulkLessons([]);
+      }
+    } else {
+      // Re-validate existing content
+      handleJsonChange(bulkJsonInput);
+    }
+    setIsBulkModalOpen(true);
+  };
+
+  const handleJsonChange = (text: string) => {
+    setBulkJsonInput(text);
+    if (!text.trim()) {
+      setBulkParseError(null);
+      setParsedBulkLessons([]);
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(text);
+      if (!Array.isArray(parsed)) {
+        setBulkParseError('Dữ liệu JSON phải là một mảng [] (Array các bài học)');
+        setParsedBulkLessons([]);
+        return;
+      }
+      if (parsed.length === 0) {
+        setBulkParseError('Mảng JSON không chứa phần tử bài học nào');
+        setParsedBulkLessons([]);
+        return;
+      }
+
+      // Check item validity
+      const invalidIndex = parsed.findIndex(
+        (item: any) =>
+          !item || typeof item !== 'object' || !(item.lessonName || item.name || item.title)
+      );
+      if (invalidIndex !== -1) {
+        setBulkParseError(`Phần tử thứ #${invalidIndex + 1} thiếu tên bài học (lessonName)`);
+        setParsedBulkLessons(parsed);
+        return;
+      }
+
+      setBulkParseError(null);
+      setParsedBulkLessons(parsed);
+    } catch (err: any) {
+      setBulkParseError(`Cú pháp JSON không hợp lệ: ${err.message}`);
+      setParsedBulkLessons([]);
+    }
+  };
+
+  const handleInsertSampleJson = () => {
+    handleJsonChange(SAMPLE_BULK_JSON);
+  };
+
+  const handleClearJson = () => {
+    setBulkJsonInput('');
+    setBulkParseError(null);
+    setParsedBulkLessons([]);
+  };
+
+  const handleExecuteBulkImport = async () => {
+    if (parsedBulkLessons.length === 0) {
+      alert('Vui lòng cung cấp dữ liệu JSON bài học hợp lệ!');
+      return;
+    }
+
+    if (bulkParseError) {
+      alert(`Vui lòng sửa lỗi trước khi nhập: ${bulkParseError}`);
+      return;
+    }
+
+    // Check if any lesson lacks bookId and no default book is selected
+    const missingBook = parsedBulkLessons.some(l => !l.bookId && !bulkDefaultBookId);
+    if (missingBook) {
+      alert('Một số bài học chưa có bookId. Vui lòng chọn "Cuốn sách mặc định" ở mục bên trên!');
+      return;
+    }
+
+    setActionLoading(true);
+    try {
+      const res = await fetch('/api/admin/lessons', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'bulk_create',
+          lessons: parsedBulkLessons,
+          defaultBookId: bulkDefaultBookId || undefined
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Lỗi khi nhập hàng loạt bài học');
+
+      showToast(`🎉 ${data.message || `Đã nhập thành công ${data.count} bài học!`}`);
+      setIsBulkModalOpen(false);
+      fetchLessonsData();
+    } catch (err: any) {
+      alert(err.message || 'Lỗi khi nhập hàng loạt');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   // Access Denied Screen
   if (!isAdmin) {
     return (
@@ -381,6 +537,15 @@ export const AdminLessonsView: React.FC<AdminLessonsViewProps> = ({
           >
             <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
             <span>Làm mới</span>
+          </button>
+          <button
+            type="button"
+            className={styles.btnBulk}
+            onClick={handleOpenBulkModal}
+            title="Nhập hàng loạt bài học từ JSON"
+          >
+            <FileJson size={16} />
+            <span>Nhập hàng loạt</span>
           </button>
           <button
             type="button"
@@ -563,9 +728,15 @@ export const AdminLessonsView: React.FC<AdminLessonsViewProps> = ({
                         </div>
                       </td>
                       <td>
-                        <span className={styles.countBadge}>
+                        <button
+                          type="button"
+                          className={styles.countBadge}
+                          onClick={() => onNavigateToVocabularies?.(lesson.id)}
+                          title="Xem và quản lý từ vựng của bài học này"
+                          style={{ cursor: onNavigateToVocabularies ? 'pointer' : 'default', border: 'none', background: '#fef3c7' }}
+                        >
                           <BookA size={12} /> {vocabCount} từ vựng
-                        </span>
+                        </button>
                       </td>
                       <td>
                         <button
@@ -587,6 +758,19 @@ export const AdminLessonsView: React.FC<AdminLessonsViewProps> = ({
                       </td>
                       <td>
                         <div className={styles.actionCell}>
+                          {/* Quản lý từ vựng */}
+                          {onNavigateToVocabularies && (
+                            <button
+                              type="button"
+                              className={styles.iconBtn}
+                              style={{ color: '#7c3aed' }}
+                              onClick={() => onNavigateToVocabularies(lesson.id)}
+                              title="Quản lý các từ vựng trong bài học này"
+                            >
+                              <BookA size={15} />
+                            </button>
+                          )}
+
                           {/* Sửa bài học */}
                           <button
                             type="button"
@@ -763,6 +947,194 @@ export const AdminLessonsView: React.FC<AdminLessonsViewProps> = ({
               >
                 <Trash2 size={16} />
                 <span>{actionLoading ? 'Đang xóa...' : 'Xóa bài học'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==================== MODAL: NHẬP HÀNG LOẠT (BULK JSON) ==================== */}
+      {isBulkModalOpen && (
+        <div className={styles.modalOverlay} onClick={() => setIsBulkModalOpen(false)}>
+          <div
+            className={`${styles.modalBox} ${styles.modalBoxWide}`}
+            onClick={e => e.stopPropagation()}
+          >
+            <div className={styles.modalHeader}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div className={styles.bulkIconCircle}>
+                  <FileJson size={20} color="#7c3aed" />
+                </div>
+                <div>
+                  <h3 className={styles.modalTitle}>Nhập Hàng Loạt Bài Học</h3>
+                  <p className={styles.modalSubtitle}>
+                    Dán chuỗi JSON danh sách bài học để thêm nhanh vào hệ thống
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                className={styles.closeModalBtn}
+                onClick={() => setIsBulkModalOpen(false)}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className={styles.bulkFormContent}>
+              {/* Chọn sách mặc định */}
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>
+                  Cuốn sách mặc định <span style={{ fontWeight: 400, color: 'var(--text-secondary)' }}>(áp dụng cho bài chưa có bookId trong JSON)</span>
+                </label>
+                <select
+                  className={styles.formInput}
+                  value={bulkDefaultBookId}
+                  onChange={e => setBulkDefaultBookId(e.target.value)}
+                >
+                  <option value="">-- Chọn cuốn sách --</option>
+                  {books.map(b => (
+                    <option key={b.id} value={b.id}>
+                      {b.bookName} {b.book_series?.name ? `(${b.book_series.name})` : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* JSON Toolbar */}
+              <div className={styles.jsonToolbar}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <button
+                    type="button"
+                    className={styles.smallActionBtn}
+                    onClick={handleInsertSampleJson}
+                    title="Chèn dữ liệu JSON mẫu chuẩn"
+                  >
+                    <Sparkles size={13} />
+                    <span>Chèn JSON mẫu</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.smallActionBtn}
+                    onClick={handleClearJson}
+                    title="Xóa trắng khung nhập"
+                  >
+                    <Trash2 size={13} />
+                    <span>Xóa</span>
+                  </button>
+                </div>
+
+                {/* Validation Status Badge */}
+                <div>
+                  {bulkParseError ? (
+                    <span className={styles.statusBadgeError}>
+                      <AlertCircle size={13} />
+                      <span>{bulkParseError.length > 35 ? 'Lỗi cú pháp JSON' : bulkParseError}</span>
+                    </span>
+                  ) : parsedBulkLessons.length > 0 ? (
+                    <span className={styles.statusBadgeSuccess}>
+                      <CheckCircle2 size={13} />
+                      <span>{parsedBulkLessons.length} bài học hợp lệ</span>
+                    </span>
+                  ) : (
+                    <span className={styles.statusBadgeEmpty}>Chưa có dữ liệu</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Textarea */}
+              <div className={styles.formGroup} style={{ marginBottom: 12 }}>
+                <textarea
+                  className={styles.jsonTextarea}
+                  rows={9}
+                  placeholder={`[
+  {
+    "lessonName": "Bài 1: Chào hỏi cơ bản",
+    "isLocked": false,
+    "wordCount": 15
+  }
+]`}
+                  value={bulkJsonInput}
+                  onChange={e => handleJsonChange(e.target.value)}
+                  spellCheck={false}
+                />
+              </div>
+
+              {/* Error Alert Box */}
+              {bulkParseError && (
+                <div className={styles.jsonErrorAlert}>
+                  <AlertCircle size={16} style={{ flexShrink: 0, marginTop: 2 }} />
+                  <div>
+                    <strong>Phát hiện lỗi JSON:</strong> {bulkParseError}
+                  </div>
+                </div>
+              )}
+
+              {/* Warning if missing bookId */}
+              {!bulkParseError &&
+                parsedBulkLessons.length > 0 &&
+                !bulkDefaultBookId &&
+                parsedBulkLessons.some(l => !l.bookId) && (
+                  <div className={styles.jsonWarningAlert}>
+                    <AlertCircle size={16} style={{ flexShrink: 0, marginTop: 2 }} />
+                    <div>
+                      <strong>Cảnh báo:</strong> Một số bài học trong danh sách chưa có <code>bookId</code>. Vui lòng chọn <strong>Cuốn sách mặc định</strong> ở trên để tự động gán!
+                    </div>
+                  </div>
+                )}
+
+              {/* Live Preview of parsed items */}
+              {!bulkParseError && parsedBulkLessons.length > 0 && (
+                <div className={styles.jsonPreviewBox}>
+                  <div className={styles.previewHeader}>
+                    <span style={{ fontWeight: 800 }}>Xem trước ({parsedBulkLessons.length} bài):</span>
+                    <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+                      {parsedBulkLessons.filter(l => Boolean(l.isLocked ?? l.locked ?? l.isPremium)).length} bài VIP Khóa / {parsedBulkLessons.filter(l => !Boolean(l.isLocked ?? l.locked ?? l.isPremium)).length} bài Miễn phí
+                    </span>
+                  </div>
+                  <div className={styles.previewChipsList}>
+                    {parsedBulkLessons.slice(0, 15).map((item, idx) => {
+                      const name = item.lessonName || item.name || item.title || `Bài #${idx + 1}`;
+                      const isLocked = Boolean(item.isLocked ?? item.locked ?? item.isPremium);
+                      return (
+                        <div key={idx} className={styles.previewChip}>
+                          {isLocked ? <Lock size={12} color="#e11d48" /> : <Unlock size={12} color="#059669" />}
+                          <span className={styles.previewChipText}>{name}</span>
+                          {item.wordCount ? <span className={styles.previewChipCount}>{item.wordCount} từ</span> : null}
+                        </div>
+                      );
+                    })}
+                    {parsedBulkLessons.length > 15 && (
+                      <div className={styles.previewChipMore}>
+                        +{parsedBulkLessons.length - 15} bài khác...
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className={styles.modalFooter}>
+              <button
+                type="button"
+                className={styles.btnSecondary}
+                onClick={() => setIsBulkModalOpen(false)}
+                disabled={actionLoading}
+              >
+                Hủy bỏ
+              </button>
+              <button
+                type="button"
+                className={styles.btnBulkConfirm}
+                onClick={handleExecuteBulkImport}
+                disabled={actionLoading || parsedBulkLessons.length === 0 || Boolean(bulkParseError)}
+              >
+                <Check size={16} />
+                <span>
+                  {actionLoading
+                    ? 'Đang nhập...'
+                    : `Nhập ${parsedBulkLessons.length > 0 ? `${parsedBulkLessons.length} bài học` : 'hàng loạt'}`}
+                </span>
               </button>
             </div>
           </div>

@@ -24,14 +24,18 @@ import {
   AdminUsersView,
   AdminCoursesView,
   AdminLessonsView,
+  AdminVocabulariesView,
 } from '@/components';
 import { TOCFLLevelItem, MenuItem } from '@/types';
 import { TOCFL_LEVELS } from '@/data/tocflData';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useUser } from '@/providers/UserProvider';
 
 export default function ClientPage({ courseId, lessonId, initialActiveMenuId = 'home' }: { courseId?: string; lessonId?: string; initialActiveMenuId?: string }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const targetBookId = searchParams?.get('bookId') || undefined;
+  const targetLessonId = searchParams?.get('lessonId') || undefined;
   const { openLoginModal } = useUser();
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
   const [activeMenuId, setActiveMenuId] = useState(initialActiveMenuId);
@@ -100,7 +104,8 @@ export default function ClientPage({ courseId, lessonId, initialActiveMenuId = '
       'admin': '/admin/users',
       'admin-users': '/admin/users',
       'admin-courses': '/admin/courses',
-      'admin-lessons': '/admin/lessons'
+      'admin-lessons': '/admin/lessons',
+      'admin-vocabularies': '/admin/vocabularies'
     };
 
     if (routeMapping[item.id]) {
@@ -205,7 +210,18 @@ export default function ClientPage({ courseId, lessonId, initialActiveMenuId = '
                 }}
               />
             ) : activeMenuId === 'admin-lessons' ? (
-              <AdminLessonsView onBack={() => setActiveMenuId('home')} />
+              <AdminLessonsView
+                onBack={() => setActiveMenuId('home')}
+                initialBookId={targetBookId}
+                onNavigateToVocabularies={(lId) => {
+                  router.push(`/admin/vocabularies${lId ? `?lessonId=${encodeURIComponent(lId)}` : ''}`);
+                }}
+              />
+            ) : activeMenuId === 'admin-vocabularies' ? (
+              <AdminVocabulariesView
+                onBack={() => setActiveMenuId('home')}
+                initialLessonId={targetLessonId}
+              />
             ) : (
               <>
                 {/* Hero Greeting Section */}
