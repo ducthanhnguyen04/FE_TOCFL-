@@ -353,7 +353,15 @@ export const AdminVocabulariesView: React.FC<AdminVocabulariesViewProps> = ({
             pinyin: "Nǐ hǎo! Hěn gāoxìng rènshí nǐ.",
             vietnammeaning: "Xin chào! Rất vui được làm quen với bạn.",
             englishmeaning: "Hello! Nice to meet you.",
-            indonesiameaning: "Halo! Senang bertemu denganmu."
+            indonesiameaning: "Halo! Senang bertemu với bạn."
+          }
+        ],
+        readings: [
+          {
+            question: "____好，我叫小明。",
+            pinyin: "____ hǎo, wǒ jiào Xiǎomíng.",
+            vietnameseMeaning: "Chào bạn, tôi tên Tiểu Minh.",
+            answer: "你"
           }
         ]
       },
@@ -371,6 +379,14 @@ export const AdminVocabulariesView: React.FC<AdminVocabulariesViewProps> = ({
             englishmeaning: "Thank you for your help!",
             indonesiameaning: "Terima kasih atas bantuanmu!"
           }
+        ],
+        readings: [
+          {
+            question: "____你！ - 不客氣。",
+            pinyin: "____ nǐ! - Bú kèqì.",
+            vietnameseMeaning: "Cảm ơn bạn! - Không có gì.",
+            answer: "謝謝"
+          }
         ]
       },
       {
@@ -387,6 +403,14 @@ export const AdminVocabulariesView: React.FC<AdminVocabulariesViewProps> = ({
             englishmeaning: "You're welcome, this is what I should do.",
             indonesiameaning: "Sama-sama, ini sudah seharusnya saya lakukan."
           }
+        ],
+        readings: [
+          {
+            question: "謝謝你。 - ____。",
+            pinyin: "Xièxie nǐ. - ____.",
+            vietnameseMeaning: "Cảm ơn bạn. - Đừng khách sáo.",
+            answer: "不客氣"
+          }
         ]
       },
       {
@@ -402,6 +426,14 @@ export const AdminVocabulariesView: React.FC<AdminVocabulariesViewProps> = ({
             vietnammeaning: "Ngày mai gặp lại, tạm biệt nhé!",
             englishmeaning: "See you tomorrow, goodbye!",
             indonesiameaning: "Sampai jumpa besok, selamat tinggal!"
+          }
+        ],
+        readings: [
+          {
+            question: "明天____。",
+            pinyin: "Míngtiān ____.",
+            vietnameseMeaning: "Ngày mai tạm biệt / gặp lại.",
+            answer: "再見"
           }
         ]
       }
@@ -528,6 +560,22 @@ export const AdminVocabulariesView: React.FC<AdminVocabulariesViewProps> = ({
         return acc + item.examples.length;
       }
       if (item.example && typeof item.example === 'string' && item.example.trim()) {
+        return acc + 1;
+      }
+      return acc;
+    }, 0);
+  }, [parsedBulkVocabs]);
+
+  // Count total reading questions in parsed JSON
+  const totalReadingsInBulk = useMemo(() => {
+    return parsedBulkVocabs.reduce((acc, item) => {
+      if (Array.isArray(item.readings)) {
+        return acc + item.readings.length;
+      }
+      if (item.reading && typeof item.reading === 'object') {
+        return acc + 1;
+      }
+      if (item.question && typeof item.question === 'string' && item.question.trim()) {
         return acc + 1;
       }
       return acc;
@@ -1127,7 +1175,9 @@ export const AdminVocabulariesView: React.FC<AdminVocabulariesViewProps> = ({
                   ) : parsedBulkVocabs.length > 0 ? (
                     <span className={styles.statusBadgeSuccess}>
                       <CheckCircle2 size={13} />
-                      <span>{parsedBulkVocabs.length} từ vựng ({totalExamplesInBulk} ví dụ)</span>
+                      <span>
+                        {parsedBulkVocabs.length} từ vựng ({totalExamplesInBulk} ví dụ{totalReadingsInBulk > 0 ? `, ${totalReadingsInBulk} bài đọc` : ''})
+                      </span>
                     </span>
                   ) : (
                     <span className={styles.statusBadgeEmpty}>Chưa có dữ liệu</span>
@@ -1192,10 +1242,10 @@ export const AdminVocabulariesView: React.FC<AdminVocabulariesViewProps> = ({
                 <div className={styles.jsonPreviewBox}>
                   <div className={styles.previewHeader}>
                     <span style={{ fontWeight: 800 }}>
-                      Xem trước ({parsedBulkVocabs.length} từ vựng, {totalExamplesInBulk} câu ví dụ):
+                      Xem trước ({parsedBulkVocabs.length} từ vựng, {totalExamplesInBulk} câu ví dụ{totalReadingsInBulk > 0 ? `, ${totalReadingsInBulk} bài đọc` : ''}):
                     </span>
                     <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
-                      Tự động liên kết vào bảng vocabularies & examples
+                      Tự động liên kết vào vocabularies, examples &amp; readings
                     </span>
                   </div>
                   <div className={styles.previewChipsList}>
@@ -1205,6 +1255,8 @@ export const AdminVocabulariesView: React.FC<AdminVocabulariesViewProps> = ({
                       const meaning = item.vietnameseMeaning || item.meaning || item.vietnamMeaning || item.vietnamese || '';
                       const hasExample = (Array.isArray(item.examples) && item.examples.length > 0) || Boolean(item.example);
                       const exCount = Array.isArray(item.examples) ? item.examples.length : (item.example ? 1 : 0);
+                      const hasReading = (Array.isArray(item.readings) && item.readings.length > 0) || Boolean(item.reading) || Boolean(item.question);
+                      const rCount = Array.isArray(item.readings) ? item.readings.length : ((item.reading || item.question) ? 1 : 0);
 
                       return (
                         <div key={idx} className={styles.previewChip}>
@@ -1214,6 +1266,11 @@ export const AdminVocabulariesView: React.FC<AdminVocabulariesViewProps> = ({
                           {hasExample && (
                             <span className={styles.previewChipExample}>
                               📝 {exCount} ví dụ
+                            </span>
+                          )}
+                          {hasReading && (
+                            <span className={styles.previewChipReading}>
+                              📖 {rCount} bài đọc
                             </span>
                           )}
                         </div>
@@ -1250,6 +1307,8 @@ export const AdminVocabulariesView: React.FC<AdminVocabulariesViewProps> = ({
                     ? 'Đang nhập...'
                     : `Nhập ${parsedBulkVocabs.length > 0 ? `${parsedBulkVocabs.length} từ vựng` : 'hàng loạt'}${
                         totalExamplesInBulk > 0 ? ` & ${totalExamplesInBulk} ví dụ` : ''
+                      }${
+                        totalReadingsInBulk > 0 ? ` & ${totalReadingsInBulk} bài đọc` : ''
                       }`}
                 </span>
               </button>

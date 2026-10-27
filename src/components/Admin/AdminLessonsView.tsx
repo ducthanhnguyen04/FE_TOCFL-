@@ -22,7 +22,8 @@ import {
   FileJson,
   AlertCircle,
   CheckCircle2,
-  Code2
+  Code2,
+  FileQuestion
 } from 'lucide-react';
 import styles from './AdminLessonsView.module.css';
 import { useUser } from '@/providers/UserProvider';
@@ -68,12 +69,14 @@ interface AdminLessonsViewProps {
   onBack?: () => void;
   initialBookId?: string;
   onNavigateToVocabularies?: (lessonId: string) => void;
+  onNavigateToReadings?: (lessonId: string) => void;
 }
 
 export const AdminLessonsView: React.FC<AdminLessonsViewProps> = ({
   onBack,
   initialBookId,
-  onNavigateToVocabularies
+  onNavigateToVocabularies,
+  onNavigateToReadings
 }) => {
   const { user: currentUser, isAdmin } = useUser();
   const { t } = useLanguage();
@@ -768,6 +771,19 @@ export const AdminLessonsView: React.FC<AdminLessonsViewProps> = ({
                               title="Quản lý các từ vựng trong bài học này"
                             >
                               <BookA size={15} />
+                            </button>
+                          )}
+
+                          {/* Quản lý câu hỏi đọc hiểu */}
+                          {onNavigateToReadings && (
+                            <button
+                              type="button"
+                              className={styles.iconBtn}
+                              style={{ color: '#2563eb' }}
+                              onClick={() => onNavigateToReadings(lesson.id)}
+                              title="Quản lý các câu hỏi đọc hiểu trong bài học này"
+                            >
+                              <FileQuestion size={15} />
                             </button>
                           )}
 

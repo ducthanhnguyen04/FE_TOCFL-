@@ -582,4 +582,73 @@ TO authenticated
 USING (public.is_admin())
 WITH CHECK (public.is_admin());
 
+-- ==============================================================================
+-- 12. PHÂN QUYỀN VÀ BẢO MẬT BẢNG READINGS VÀ READINGANSWERS (CÂU HỎI ĐỌC HIỂU)
+-- ==============================================================================
+-- Cấp quyền bảng readings
+GRANT ALL ON TABLE public.readings TO anon, authenticated, service_role;
+ALTER TABLE public.readings ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public readings are viewable by everyone" ON public.readings;
+DROP POLICY IF EXISTS "Admins have full access to readings" ON public.readings;
+
+CREATE POLICY "Public readings are viewable by everyone"
+ON public.readings
+FOR SELECT
+TO anon, authenticated
+USING (true);
+
+CREATE POLICY "Admins have full access to readings"
+ON public.readings
+FOR ALL
+TO authenticated
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
+
+-- Cấp quyền bảng readingAnswers
+DO $$
+BEGIN
+  -- Thử cấp quyền cho readingAnswers (nếu bảng tồn tại)
+  IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'readingAnswers') THEN
+    GRANT ALL ON TABLE public."readingAnswers" TO anon, authenticated, service_role;
+    ALTER TABLE public."readingAnswers" ENABLE ROW LEVEL SECURITY;
+    
+    DROP POLICY IF EXISTS "Public reading answers are viewable by everyone" ON public."readingAnswers";
+    DROP POLICY IF EXISTS "Admins have full access to reading answers" ON public."readingAnswers";
+
+    CREATE POLICY "Public reading answers are viewable by everyone"
+    ON public."readingAnswers"
+    FOR SELECT
+    TO anon, authenticated
+    USING (true);
+
+    CREATE POLICY "Admins have full access to reading answers"
+    ON public."readingAnswers"
+    FOR ALL
+    TO authenticated
+    USING (public.is_admin())
+    WITH CHECK (public.is_admin());
+  ELSIF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'readinganswers') THEN
+    GRANT ALL ON TABLE public.readinganswers TO anon, authenticated, service_role;
+    ALTER TABLE public.readinganswers ENABLE ROW LEVEL SECURITY;
+    
+    DROP POLICY IF EXISTS "Public reading answers are viewable by everyone" ON public.readinganswers;
+    DROP POLICY IF EXISTS "Admins have full access to reading answers" ON public.readinganswers;
+
+    CREATE POLICY "Public reading answers are viewable by everyone"
+    ON public.readinganswers
+    FOR SELECT
+    TO anon, authenticated
+    USING (true);
+
+    CREATE POLICY "Admins have full access to reading answers"
+    ON public.readinganswers
+    FOR ALL
+    TO authenticated
+    USING (public.is_admin())
+    WITH CHECK (public.is_admin());
+  END IF;
+END $$;
+
+
 

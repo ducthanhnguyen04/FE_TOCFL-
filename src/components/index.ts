@@ -21,3 +21,4 @@ export { AdminUsersView } from './Admin/AdminUsersView';
 export { AdminCoursesView } from './Admin/AdminCoursesView';
 export { AdminLessonsView } from './Admin/AdminLessonsView';
 export { AdminVocabulariesView } from './Admin/AdminVocabulariesView';
+export { AdminReadingsView } from './Admin/AdminReadingsView';

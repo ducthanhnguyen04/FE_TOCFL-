@@ -25,6 +25,7 @@ import {
   Users,
   Layers,
   FolderKanban,
+  FileQuestion,
 } from 'lucide-react';
 
 interface MenuIconProps {
@@ -86,6 +87,8 @@ export const MenuIcon: React.FC<MenuIconProps> = ({ name, className, size = 20 }
       return <Layers size={size} className={className} />;
     case 'FolderKanban':
       return <FolderKanban size={size} className={className} />;
+    case 'FileQuestion':
+      return <FileQuestion size={size} className={className} />;
     default:
       return <Home size={size} className={className} />;
   }

@@ -81,6 +81,7 @@ export const MENU_ITEMS: MenuItem[] = [
       { id: 'admin-courses', label: 'Quản lý giáo trình', iconName: 'Layers' },
       { id: 'admin-lessons', label: 'Quản lý Lesson', iconName: 'FolderKanban' },
       { id: 'admin-vocabularies', label: 'Quản lý Từ Vựng', iconName: 'BookA' },
+      { id: 'admin-readings', label: 'Quản lý Đọc Hiểu', iconName: 'FileQuestion' },
     ],
   },
   {

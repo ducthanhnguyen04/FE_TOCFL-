@@ -25,6 +25,7 @@ import {
   AdminCoursesView,
   AdminLessonsView,
   AdminVocabulariesView,
+  AdminReadingsView,
 } from '@/components';
 import { TOCFLLevelItem, MenuItem } from '@/types';
 import { TOCFL_LEVELS } from '@/data/tocflData';
@@ -105,7 +106,8 @@ export default function ClientPage({ courseId, lessonId, initialActiveMenuId = '
       'admin-users': '/admin/users',
       'admin-courses': '/admin/courses',
       'admin-lessons': '/admin/lessons',
-      'admin-vocabularies': '/admin/vocabularies'
+      'admin-vocabularies': '/admin/vocabularies',
+      'admin-readings': '/admin/readings'
     };
 
     if (routeMapping[item.id]) {
@@ -216,9 +218,17 @@ export default function ClientPage({ courseId, lessonId, initialActiveMenuId = '
                 onNavigateToVocabularies={(lId) => {
                   router.push(`/admin/vocabularies${lId ? `?lessonId=${encodeURIComponent(lId)}` : ''}`);
                 }}
+                onNavigateToReadings={(lId) => {
+                  router.push(`/admin/readings${lId ? `?lessonId=${encodeURIComponent(lId)}` : ''}`);
+                }}
               />
             ) : activeMenuId === 'admin-vocabularies' ? (
               <AdminVocabulariesView
+                onBack={() => setActiveMenuId('home')}
+                initialLessonId={targetLessonId}
+              />
+            ) : activeMenuId === 'admin-readings' ? (
+              <AdminReadingsView
                 onBack={() => setActiveMenuId('home')}
                 initialLessonId={targetLessonId}
               />
